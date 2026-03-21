@@ -1,0 +1,1878 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+    <title>SADAK AI — Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0B3D91">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent
+        }
+        
+         :root {
+            --navy: #0B3D91;
+            --navy2: #1565C0;
+            --navy3: #1976D2;
+            --orange: #FF671F;
+            --orange2: #FF8C00;
+            --green: #16a34a;
+            --red: #dc2626;
+            --yellow: #ca8a04;
+            --g50: #f9fafb;
+            --g100: #f3f4f6;
+            --g200: #e5e7eb;
+            --g400: #9ca3af;
+            --g500: #6b7280;
+            --g900: #111827;
+            --white: #fff;
+            --r: 10px;
+            --r-lg: 16px;
+        }
+        
+        html,
+        body {
+            height: 100%;
+            background: #060f2e;
+            font-family: 'Inter', sans-serif;
+            color: var(--g900);
+            overflow: hidden
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            max-width: 430px;
+            margin: 0 auto
+        }
+        /* ══ ANIMATED BG ══ */
+        
+        .app-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: linear-gradient(160deg, #020a1e 0%, #060f2e 30%, #0B3D91 70%, #1565C0 100%);
+        }
+        
+        .app-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 79px, rgba(255, 255, 255, .012) 79px, rgba(255, 255, 255, .012) 80px), repeating-linear-gradient(90deg, transparent, transparent 79px, rgba(255, 255, 255, .012) 79px, rgba(255, 255, 255, .012) 80px);
+        }
+        
+        .app-bg::after {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            top: -200px;
+            right: -150px;
+            background: radial-gradient(circle, rgba(255, 103, 31, .08), transparent 65%);
+            animation: bgPulse 6s ease-in-out infinite;
+        }
+        
+        @keyframes bgPulse {
+            0%,
+            100% {
+                transform: scale(1)
+            }
+            50% {
+                transform: scale(1.1)
+            }
+        }
+        /* Floating particles */
+        
+        .particle {
+            position: fixed;
+            border-radius: 50%;
+            animation: float linear infinite;
+            pointer-events: none;
+            z-index: 0
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0
+            }
+            10% {
+                opacity: .6
+            }
+            90% {
+                opacity: .3
+            }
+            100% {
+                transform: translateY(-100px) rotate(720deg);
+                opacity: 0
+            }
+        }
+        /* ══ TOP BAR ══ */
+        
+        .topbar {
+            position: relative;
+            z-index: 10;
+            flex-shrink: 0;
+            background: rgba(2, 10, 30, .6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, .08);
+        }
+        
+        .gov-strip {
+            background: rgba(11, 61, 145, .5);
+            padding: 5px 14px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            border-bottom: 1px solid rgba(255, 255, 255, .06);
+        }
+        
+        .gov-em {
+            width: 16px;
+            height: 16px;
+            background: #fff;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: 8px;
+            color: var(--navy);
+            font-weight: 900;
+            flex-shrink: 0
+        }
+        
+        .gov-txt {
+            color: rgba(255, 255, 255, .55);
+            font-size: .58rem;
+            flex: 1
+        }
+        
+        .gov-txt b {
+            color: rgba(255, 255, 255, .8);
+            font-weight: 600
+        }
+        
+        .gov-tc {
+            display: flex;
+            gap: 2px;
+            flex-shrink: 0
+        }
+        
+        .gov-tc div {
+            width: 11px;
+            height: 2.5px;
+            border-radius: 1px
+        }
+        
+        .mainbar {
+            padding: 9px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+        
+        .logo {
+            font-size: .95rem;
+            font-weight: 900;
+            letter-spacing: .5px
+        }
+        
+        .logo .s {
+            color: var(--orange)
+        }
+        
+        .logo .a {
+            color: #fff
+        }
+        
+        .topbar-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+        
+        .lang-pill {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255, 255, 255, .1);
+            border: 1px solid rgba(255, 255, 255, .18);
+            border-radius: 20px;
+            padding: 4px 10px;
+            cursor: pointer;
+            color: #fff;
+            font-size: .68rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            transition: background .2s;
+        }
+        
+        .lang-pill:hover {
+            background: rgba(255, 255, 255, .18)
+        }
+        
+        .lang-pill svg {
+            width: 10px;
+            height: 10px;
+            fill: none;
+            stroke: #fff;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            flex-shrink: 0
+        }
+        
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+            font-size: .8rem;
+            color: #fff;
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, .3);
+            flex-shrink: 0;
+            transition: transform .2s;
+        }
+        
+        .avatar:active {
+            transform: scale(.93)
+        }
+        /* ══ CONTENT ══ */
+        
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            position: relative;
+            z-index: 1
+        }
+        
+        .content::-webkit-scrollbar {
+            display: none
+        }
+        /* ══ HERO SECTION ══ */
+        
+        .hero {
+            padding: 18px 16px 20px;
+            background: linear-gradient(180deg, rgba(11, 61, 145, .0) 0%, rgba(11, 61, 145, .0) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1
+        }
+        
+        .greet-sub {
+            font-size: .62rem;
+            color: rgba(255, 255, 255, .5);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2px
+        }
+        
+        .greet-name {
+            font-size: 1.35rem;
+            font-weight: 900;
+            color: #fff;
+            line-height: 1.1
+        }
+        
+        .greet-loc {
+            font-size: .68rem;
+            color: rgba(255, 255, 255, .45);
+            margin-top: 3px;
+            display: flex;
+            align-items: center;
+            gap: 4px
+        }
+        
+        .greet-loc svg {
+            width: 10px;
+            height: 10px;
+            fill: none;
+            stroke: rgba(255, 255, 255, .45);
+            stroke-width: 2;
+            stroke-linecap: round;
+            flex-shrink: 0
+        }
+        
+        .hero-badge {
+            background: rgba(74, 222, 128, .15);
+            border: 1px solid rgba(74, 222, 128, .3);
+            border-radius: 20px;
+            padding: 5px 11px;
+            font-size: .6rem;
+            font-weight: 700;
+            color: #4ade80;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+        
+        .live-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #4ade80;
+            animation: blink 2s ease-in-out infinite
+        }
+        
+        @keyframes blink {
+            0%,
+            100% {
+                opacity: 1
+            }
+            50% {
+                opacity: .15
+            }
+        }
+        /* ══ STATS CARDS ══ */
+        
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            position: relative;
+            z-index: 1
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, .08);
+            border: 1px solid rgba(255, 255, 255, .12);
+            border-radius: 12px;
+            padding: 12px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all .2s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, .06), transparent);
+            border-radius: 12px;
+        }
+        
+        .stat-card:active {
+            transform: scale(.96);
+            background: rgba(255, 255, 255, .14)
+        }
+        
+        .stat-num {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: #fff;
+            line-height: 1;
+            margin-bottom: 2px;
+            position: relative
+        }
+        
+        .stat-lbl {
+            font-size: .56rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, .45);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            position: relative
+        }
+        
+        .stat-icon {
+            font-size: .7rem;
+            margin-bottom: 2px;
+            opacity: .6;
+            position: relative
+        }
+        
+        .sn-green {
+            color: #4ade80
+        }
+        
+        .sn-red {
+            color: #f87171
+        }
+        
+        .sn-amber {
+            color: #fbbf24
+        }
+        /* ══ MAIN SCAN BUTTON ══ */
+        
+        .scan-hero {
+            margin: 14px 16px 0;
+            background: linear-gradient(135deg, var(--orange), var(--orange2));
+            border-radius: var(--r-lg);
+            padding: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 8px 24px rgba(255, 103, 31, .35), 0 2px 8px rgba(255, 103, 31, .2);
+            transition: all .2s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .scan-hero::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .1);
+        }
+        
+        .scan-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            left: 60px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .06);
+        }
+        
+        .scan-hero:active {
+            transform: scale(.98)
+        }
+        
+        .sh-ic {
+            width: 52px;
+            height: 52px;
+            background: rgba(255, 255, 255, .2);
+            border-radius: 13px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+            border: 1.5px solid rgba(255, 255, 255, .3);
+        }
+        
+        .sh-ic svg {
+            width: 26px;
+            height: 26px;
+            fill: none;
+            stroke: #fff;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+        
+        .sh-text {
+            flex: 1;
+            position: relative;
+            z-index: 1
+        }
+        
+        .sh-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 3px
+        }
+        
+        .sh-desc {
+            font-size: .72rem;
+            color: rgba(255, 255, 255, .75);
+            line-height: 1.4
+        }
+        
+        .sh-pulse {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            z-index: 1;
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, .2);
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+        }
+        
+        .sh-pulse svg {
+            width: 14px;
+            height: 14px;
+            fill: none;
+            stroke: #fff;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+        /* ══ SECTION HEADER ══ */
+        
+        .sec-hdr {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 16px 8px
+        }
+        
+        .sec-title {
+            font-size: .65rem;
+            font-weight: 800;
+            color: rgba(255, 255, 255, .45);
+            text-transform: uppercase;
+            letter-spacing: 1.5px
+        }
+        
+        .sec-link {
+            font-size: .72rem;
+            color: rgba(255, 255, 255, .6);
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 3px
+        }
+        
+        .sec-link svg {
+            width: 12px;
+            height: 12px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+        /* ══ QUICK ACTIONS ══ */
+        
+        .qa-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            padding: 0 16px 14px
+        }
+        
+        .qa {
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 12px;
+            padding: 13px 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all .2s;
+        }
+        
+        .qa:active {
+            background: rgba(255, 255, 255, .14);
+            transform: scale(.95)
+        }
+        
+        .qa-ic {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            margin: 0 auto 7px;
+        }
+        
+        .qa-ic svg {
+            width: 17px;
+            height: 17px;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+        
+        .qa-lbl {
+            font-size: .6rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, .6);
+            line-height: 1.3
+        }
+        
+        .ic-blue {
+            background: rgba(59, 130, 246, .2);
+            border: 1px solid rgba(59, 130, 246, .25)
+        }
+        
+        .ic-blue svg {
+            stroke: #60a5fa
+        }
+        
+        .ic-or {
+            background: rgba(255, 103, 31, .2);
+            border: 1px solid rgba(255, 103, 31, .25)
+        }
+        
+        .ic-or svg {
+            stroke: #fb923c
+        }
+        
+        .ic-gr {
+            background: rgba(22, 163, 74, .2);
+            border: 1px solid rgba(22, 163, 74, .25)
+        }
+        
+        .ic-gr svg {
+            stroke: #4ade80
+        }
+        
+        .ic-gy {
+            background: rgba(255, 255, 255, .1);
+            border: 1px solid rgba(255, 255, 255, .15)
+        }
+        
+        .ic-gy svg {
+            stroke: rgba(255, 255, 255, .6)
+        }
+        /* ══ ROAD QUALITY CARD ══ */
+        
+        .rqi-card {
+            margin: 0 16px 14px;
+            border-radius: var(--r-lg);
+            overflow: hidden;
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(255, 255, 255, .1);
+        }
+        
+        .rqi-head {
+            background: linear-gradient(90deg, rgba(11, 61, 145, .8), rgba(21, 101, 192, .8));
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .rqi-head svg {
+            width: 14px;
+            height: 14px;
+            fill: none;
+            stroke: #fff;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+        
+        .rqi-head-title {
+            font-size: .76rem;
+            font-weight: 700;
+            color: #fff;
+            flex: 1
+        }
+        
+        .rqi-head-zone {
+            font-size: .64rem;
+            color: rgba(255, 255, 255, .55)
+        }
+        
+        .rqi-body {
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 14px
+        }
+        
+        .rqi-circle {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: 1.3rem;
+            font-weight: 900;
+            flex-shrink: 0;
+            border: 3px solid rgba(255, 255, 255, .15);
+            background: rgba(255, 255, 255, .06);
+            color: #fff;
+        }
+        
+        .rqi-info {
+            flex: 1
+        }
+        
+        .rqi-grade {
+            font-size: .84rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+        
+        .rqi-bar-wrap {
+            background: rgba(255, 255, 255, .1);
+            border-radius: 3px;
+            height: 5px;
+            overflow: hidden;
+            margin-bottom: 4px
+        }
+        
+        .rqi-bar {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 1.2s ease
+        }
+        
+        .rqi-meta {
+            font-size: .64rem;
+            color: rgba(255, 255, 255, .4)
+        }
+        
+        .rqi-trend {
+            font-size: .6rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px
+        }
+        /* ══ RECENT REPORTS ══ */
+        
+        .comp-list {
+            padding: 0 16px 8px
+        }
+        
+        .comp-item {
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 12px;
+            padding: 11px 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            display: flex;
+            gap: 10px;
+            transition: all .2s;
+        }
+        
+        .comp-item:active {
+            background: rgba(255, 255, 255, .12);
+            transform: scale(.99)
+        }
+        
+        .sev-bar {
+            width: 4px;
+            border-radius: 2px;
+            flex-shrink: 0;
+            align-self: stretch;
+            min-height: 40px
+        }
+        
+        .comp-body {
+            flex: 1;
+            min-width: 0
+        }
+        
+        .comp-cid {
+            font-size: .6rem;
+            font-family: monospace;
+            color: rgba(99, 179, 237, .8);
+            font-weight: 600;
+            margin-bottom: 2px
+        }
+        
+        .comp-desc {
+            font-size: .8rem;
+            font-weight: 600;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 2px
+        }
+        
+        .comp-loc {
+            font-size: .68rem;
+            color: rgba(255, 255, 255, .4)
+        }
+        
+        .comp-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+            flex-shrink: 0
+        }
+        
+        .badge {
+            font-size: .56rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 10px
+        }
+        
+        .b-filed {
+            background: rgba(59, 130, 246, .2);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, .2)
+        }
+        
+        .b-ack {
+            background: rgba(251, 191, 36, .15);
+            color: #fde047;
+            border: 1px solid rgba(251, 191, 36, .2)
+        }
+        
+        .b-prog {
+            background: rgba(249, 115, 22, .15);
+            color: #fb923c;
+            border: 1px solid rgba(249, 115, 22, .2)
+        }
+        
+        .b-done {
+            background: rgba(74, 222, 128, .15);
+            color: #4ade80;
+            border: 1px solid rgba(74, 222, 128, .2)
+        }
+        
+        .b-esc {
+            background: rgba(248, 113, 113, .15);
+            color: #f87171;
+            border: 1px solid rgba(248, 113, 113, .2)
+        }
+        
+        .ai-tag {
+            font-size: .52rem;
+            font-weight: 700;
+            background: rgba(139, 92, 246, .25);
+            color: #c4b5fd;
+            padding: 2px 6px;
+            border-radius: 8px;
+            border: 1px solid rgba(139, 92, 246, .2)
+        }
+        /* ══ EMPTY STATE ══ */
+        
+        .empty {
+            text-align: center;
+            padding: 30px 20px;
+            color: rgba(255, 255, 255, .3)
+        }
+        
+        .empty-ic {
+            width: 52px;
+            height: 52px;
+            background: rgba(255, 255, 255, .06);
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            margin: 0 auto 12px
+        }
+        
+        .empty-ic svg {
+            width: 24px;
+            height: 24px;
+            fill: none;
+            stroke: rgba(255, 255, 255, .3);
+            stroke-width: 1.5
+        }
+        
+        .empty-txt {
+            font-size: .84rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, .4);
+            margin-bottom: 4px
+        }
+        
+        .empty-sub {
+            font-size: .73rem;
+            color: rgba(255, 255, 255, .25)
+        }
+        /* ══ BOTTOM NAV ══ */
+        
+        .bnav {
+            flex-shrink: 0;
+            position: relative;
+            z-index: 10;
+            background: rgba(2, 10, 30, .85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, .08);
+            display: flex;
+            padding: 4px 0 calc(env(safe-area-inset-bottom)+4px);
+        }
+        
+        .ni {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            padding: 7px;
+            cursor: pointer;
+            transition: all .2s
+        }
+        
+        .ni:active {
+            transform: scale(.92)
+        }
+        
+        .ni-ic svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: rgba(255, 255, 255, .35);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke .2s
+        }
+        
+        .ni-lbl {
+            font-size: .56rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, .3);
+            transition: color .2s
+        }
+        
+        .ni.on .ni-ic svg {
+            stroke: var(--orange)
+        }
+        
+        .ni.on .ni-lbl {
+            color: var(--orange)
+        }
+        
+        .ni-scan {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            padding: 0 2px
+        }
+        
+        .ni-scan-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer
+        }
+        
+        .ni-scan-ic {
+            width: 50px;
+            height: 50px;
+            margin-top: -18px;
+            background: linear-gradient(135deg, var(--orange), var(--orange2));
+            border-radius: 15px;
+            display: grid;
+            place-items: center;
+            box-shadow: 0 4px 16px rgba(255, 103, 31, .4);
+            border: 2.5px solid rgba(255, 255, 255, .2);
+            transition: transform .2s;
+        }
+        
+        .ni-scan-ic:active {
+            transform: scale(.92)
+        }
+        
+        .ni-scan-ic svg {
+            width: 24px;
+            height: 24px;
+            fill: none;
+            stroke: #fff;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+        
+        .ni-scan-lbl {
+            font-size: .56rem;
+            font-weight: 700;
+            color: var(--orange);
+            margin-top: 2px
+        }
+        /* ══ LANGUAGE MODAL ══ */
+        
+        .modal-bg {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: rgba(0, 0, 0, .6);
+            backdrop-filter: blur(4px);
+            align-items: flex-end;
+            justify-content: center
+        }
+        
+        .modal-bg.open {
+            display: flex
+        }
+        
+        .lang-sheet {
+            background: linear-gradient(to bottom, #0d1b3e, #0a1428);
+            border-radius: 20px 20px 0 0;
+            width: 100%;
+            max-width: 430px;
+            max-height: 80vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(255, 255, 255, .1)
+        }
+        
+        .lang-head {
+            padding: 14px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, .08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0
+        }
+        
+        .lang-head-title {
+            font-size: .9rem;
+            font-weight: 700;
+            color: #fff
+        }
+        
+        .lang-x {
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, .1);
+            border: none;
+            border-radius: 8px;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            color: rgba(255, 255, 255, .6);
+            font-size: .9rem
+        }
+        
+        .lang-list {
+            overflow-y: auto;
+            padding: 8px 0
+        }
+        
+        .lang-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 18px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-family: 'Inter', sans-serif;
+            transition: background .15s
+        }
+        
+        .lang-item:hover,
+        .lang-item.on {
+            background: rgba(255, 255, 255, .07)
+        }
+        
+        .lang-flag {
+            font-size: 1.2rem;
+            width: 28px;
+            text-align: center;
+            flex-shrink: 0
+        }
+        
+        .lang-name {
+            font-size: .86rem;
+            font-weight: 500;
+            color: #fff;
+            flex: 1
+        }
+        
+        .lang-native {
+            font-size: .76rem;
+            color: rgba(255, 255, 255, .4)
+        }
+        
+        .lang-check {
+            width: 16px;
+            height: 16px;
+            color: var(--orange);
+            flex-shrink: 0;
+            display: none
+        }
+        
+        .lang-item.on .lang-check {
+            display: block
+        }
+        /* ══ TRACK MODAL ══ */
+        
+        .track-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: rgba(0, 0, 0, .7);
+            backdrop-filter: blur(4px);
+            align-items: flex-end;
+            justify-content: center
+        }
+        
+        .track-modal.open {
+            display: flex
+        }
+        
+        .track-sheet {
+            background: linear-gradient(to bottom, #0d1b3e, #0a1428);
+            border-radius: 20px 20px 0 0;
+            width: 100%;
+            max-width: 430px;
+            padding: 20px 18px calc(env(safe-area-inset-bottom)+20px);
+            border: 1px solid rgba(255, 255, 255, .1)
+        }
+        
+        .track-title {
+            font-size: .92rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 14px
+        }
+        
+        .track-input {
+            width: 100%;
+            background: rgba(255, 255, 255, .08);
+            border: 1.5px solid rgba(255, 255, 255, .15);
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: .87rem;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+            outline: none;
+            text-transform: uppercase;
+            letter-spacing: 1px
+        }
+        
+        .track-input:focus {
+            border-color: var(--orange)
+        }
+        
+        .track-input::placeholder {
+            color: rgba(255, 255, 255, .3);
+            text-transform: none;
+            letter-spacing: 0
+        }
+        
+        .track-btn {
+            width: 100%;
+            margin-top: 10px;
+            background: linear-gradient(90deg, var(--navy), var(--navy2));
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: .9rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px
+        }
+        
+        .track-close {
+            width: 100%;
+            margin-top: 8px;
+            background: rgba(255, 255, 255, .07);
+            border: 1px solid rgba(255, 255, 255, .1);
+            color: rgba(255, 255, 255, .5);
+            border-radius: 10px;
+            padding: 11px;
+            font-family: 'Inter', sans-serif;
+            font-size: .82rem;
+            cursor: pointer
+        }
+        
+        .track-res {
+            margin-top: 12px;
+            font-size: .8rem;
+            color: #fff;
+            background: rgba(255, 255, 255, .06);
+            border-radius: 10px;
+            padding: 12px;
+            display: none
+        }
+        
+        .track-res.show {
+            display: block
+        }
+        /* ══ INSTALL BANNER ══ */
+        
+        .install-banner {
+            display: none;
+            margin: 10px 16px 0;
+            background: linear-gradient(90deg, rgba(11, 61, 145, .8), rgba(21, 101, 192, .7));
+            border: 1px solid rgba(255, 255, 255, .15);
+            border-radius: 12px;
+            padding: 11px 12px;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            z-index: 5
+        }
+        
+        .install-banner.show {
+            display: flex
+        }
+        
+        .install-banner button.go {
+            background: var(--orange);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 7px 13px;
+            font-size: .74rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            flex-shrink: 0
+        }
+        
+        .install-banner button.no {
+            background: rgba(255, 255, 255, .1);
+            color: rgba(255, 255, 255, .5);
+            border: none;
+            border-radius: 8px;
+            padding: 7px 9px;
+            font-size: .74rem;
+            cursor: pointer;
+            flex-shrink: 0
+        }
+        /* ══ SPINNING LOADER ══ */
+        
+        .sp {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, .15);
+            border-top-color: rgba(255, 255, 255, .7);
+            border-radius: 50%;
+            animation: spin .6s linear infinite;
+            margin: 20px auto;
+            display: block
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+        /* Number counter animation */
+        
+        @keyframes countUp {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+        
+        .stat-num {
+            animation: countUp .6s ease both
+        }
+        /* Card entrance */
+        
+        @keyframes cardIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px)
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+        
+        .scan-hero {
+            animation: cardIn .5s ease .1s both
+        }
+        
+        .rqi-card {
+            animation: cardIn .5s ease .2s both
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-bg"></div>
+
+    <!-- Floating particles -->
+    <div class="particle" style="left:15%;width:3px;height:3px;background:rgba(255,103,31,.4);animation-duration:12s;animation-delay:0s"></div>
+    <div class="particle" style="left:40%;width:2px;height:2px;background:rgba(255,255,255,.3);animation-duration:18s;animation-delay:-5s"></div>
+    <div class="particle" style="left:70%;width:3px;height:3px;background:rgba(99,179,237,.4);animation-duration:14s;animation-delay:-8s"></div>
+    <div class="particle" style="left:85%;width:2px;height:2px;background:rgba(255,103,31,.3);animation-duration:20s;animation-delay:-3s"></div>
+    <div class="particle" style="left:25%;width:2px;height:2px;background:rgba(255,255,255,.2);animation-duration:16s;animation-delay:-11s"></div>
+
+    <!-- ══ TOPBAR ══ -->
+    <div class="topbar">
+        <div class="gov-strip">
+            <div class="gov-em">&#9784;</div>
+            <div class="gov-txt"><b>Government of India</b> — Ministry of Road Transport &amp; Highways</div>
+            <div class="gov-tc">
+                <div style="background:#FF9933"></div>
+                <div style="background:#fff"></div>
+                <div style="background:#138808"></div>
+            </div>
+        </div>
+        <div class="mainbar">
+            <div class="logo"><span class="s">SADAK</span><span class="a">AI</span></div>
+            <div class="topbar-right">
+                <button class="lang-pill" onclick="openLang()" id="langBtn">
+        <span id="langFlag">🇮🇳</span>
+        <span id="langName">EN</span>
+        <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+                <div class="avatar" id="userAvatar" onclick="location.href='/history'">U</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ CONTENT ══ -->
+    <div class="content">
+
+        <!-- HERO -->
+        <div class="hero">
+            <div class="hero-top">
+                <div>
+                    <div class="greet-sub" id="greetTime">Good Morning</div>
+                    <div class="greet-name" id="greetName">Loading...</div>
+                    <div class="greet-loc">
+                        <svg viewBox="0 0 24 24"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0112 2a8 8 0 018 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>
+                        <span id="greetLoc">India</span>
+                    </div>
+                </div>
+                <div class="hero-badge">
+                    <div class="live-dot"></div>AI ACTIVE</div>
+            </div>
+            <div class="stats-row">
+                <div class="stat-card" onclick="location.href='/history'">
+                    <div class="stat-icon">📋</div>
+                    <div class="stat-num" id="st-total">—</div>
+                    <div class="stat-lbl">Reported</div>
+                </div>
+                <div class="stat-card" onclick="location.href='/history?filter=resolved'">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-num sn-green" id="st-resolved">—</div>
+                    <div class="stat-lbl">Resolved</div>
+                </div>
+                <div class="stat-card" onclick="location.href='/history?filter=critical'">
+                    <div class="stat-icon">🚨</div>
+                    <div class="stat-num sn-red" id="st-critical">—</div>
+                    <div class="stat-lbl">Critical</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INSTALL BANNER -->
+        <div class="install-banner" id="installBanner">
+            <div style="flex:1">
+                <div style="color:#fff;font-size:.8rem;font-weight:700">Install SADAK AI</div>
+                <div style="color:rgba(255,255,255,.5);font-size:.65rem">Add to home screen for quick access</div>
+            </div>
+            <button class="go" onclick="installApp()">Install</button>
+            <button class="no" onclick="dismissInstall()">✕</button>
+        </div>
+
+        <!-- SCAN HERO BUTTON -->
+        <div class="scan-hero" onclick="location.href='/scanner'">
+            <div class="sh-ic">
+                <svg viewBox="0 0 24 24"><path d="M2 9V5a2 2 0 012-2h4M16 3h4a2 2 0 012 2v4M2 15v4a2 2 0 002 2h4M16 21h4a2 2 0 002-2v-4"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <div class="sh-text">
+                <div class="sh-title">Scan Road for Potholes</div>
+                <div class="sh-desc">AI detects &amp; files complaint instantly</div>
+            </div>
+            <div class="sh-pulse">
+                <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </div>
+        </div>
+
+        <!-- QUICK ACTIONS -->
+        <div class="sec-hdr">
+            <div class="sec-title">Quick Actions</div>
+        </div>
+        <div class="qa-grid">
+            <div class="qa" onclick="location.href='/scanner'">
+                <div class="qa-ic ic-blue"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M2 9V5a2 2 0 012-2h4M16 3h4a2 2 0 012 2v4M2 15v4a2 2 0 002 2h4M16 21h4a2 2 0 002-2v-4"/></svg></div>
+                <div class="qa-lbl">Scan &amp; Report</div>
+            </div>
+            <div class="qa" onclick="location.href='/history'">
+                <div class="qa-ic ic-or"><svg viewBox="0 0 24 24"><path d="M9 12h6M9 16h6M9 8h6M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg></div>
+                <div class="qa-lbl">My Reports</div>
+            </div>
+            <div class="qa" onclick="showTrack()">
+                <div class="qa-ic ic-gr"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></div>
+                <div class="qa-lbl">Track Status</div>
+            </div>
+            <div class="qa" onclick="window.open('tel:1033')">
+                <div class="qa-ic ic-gy"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2A19.79 19.79 0 013 7.15 19.79 19.79 0 01.21 3.58 2 2 0 012 1.36h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 9a16 16 0 006 6z"/></svg></div>
+                <div class="qa-lbl">NHAI 1033</div>
+            </div>
+        </div>
+
+        <!-- ROAD QUALITY INDEX -->
+        <div class="rqi-card" id="rqiCard">
+            <div class="rqi-head">
+                <svg viewBox="0 0 24 24"><path d="M2 20h20M4 20V10M8 20V4M12 20v-8M16 20V7M20 20v-5"/></svg>
+                <span class="rqi-head-title">Road Quality Index</span>
+                <span class="rqi-head-zone" id="rqiZone">Detecting...</span>
+            </div>
+            <div class="rqi-body">
+                <div class="rqi-circle" id="rqiCircle">—</div>
+                <div class="rqi-info">
+                    <div class="rqi-grade" id="rqiGrade">
+                        <span>Loading data...</span>
+                    </div>
+                    <div class="rqi-bar-wrap">
+                        <div class="rqi-bar" id="rqiBar" style="width:0%;background:var(--green)"></div>
+                    </div>
+                    <div class="rqi-meta" id="rqiMeta">Based on complaints in your area</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RECENT REPORTS -->
+        <div class="sec-hdr">
+            <div class="sec-title">Recent Reports</div>
+            <div class="sec-link" onclick="location.href='/history'">View all <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+        </div>
+        <div class="comp-list" id="compList">
+            <div class="empty">
+                <div class="sp"></div>
+            </div>
+        </div>
+
+    </div>
+    <!-- end content -->
+
+    <!-- ══ BOTTOM NAV ══ -->
+    <div class="bnav">
+        <div class="ni on" onclick="location.href='/home'">
+            <div class="ni-ic"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+            <div class="ni-lbl">Home</div>
+        </div>
+        <div class="ni-scan">
+            <div class="ni-scan-wrap" onclick="location.href='/scanner'">
+                <div class="ni-scan-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M2 9V5a2 2 0 012-2h4M16 3h4a2 2 0 012 2v4M2 15v4a2 2 0 002 2h4M16 21h4a2 2 0 002-2v-4"/></svg></div>
+                <div class="ni-scan-lbl">Scan</div>
+            </div>
+        </div>
+        <div class="ni" onclick="location.href='/history'">
+            <div class="ni-ic"><svg viewBox="0 0 24 24"><path d="M9 12h6M9 16h6M9 8h6M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg></div>
+            <div class="ni-lbl">Reports</div>
+        </div>
+    </div>
+
+    <!-- LANGUAGE MODAL -->
+    <div class="modal-bg" id="langModal" onclick="if(event.target===this)closeLang()">
+        <div class="lang-sheet">
+            <div class="lang-head">
+                <div class="lang-head-title">🌐 Select Language</div>
+                <button class="lang-x" onclick="closeLang()">✕</button>
+            </div>
+            <div class="lang-list" id="langList"></div>
+        </div>
+    </div>
+
+    <!-- TRACK MODAL -->
+    <div class="track-modal" id="trackModal" onclick="if(event.target===this)closeTrack()">
+        <div class="track-sheet">
+            <div class="track-title">🔍 Track Complaint</div>
+            <input class="track-input" id="trackInput" placeholder="Enter Complaint ID (e.g. SADAK-KAR-000001)" oninput="this.value=this.value.toUpperCase()">
+            <button class="track-btn" onclick="doTrack()">Search Complaint</button>
+            <div class="track-res" id="trackRes"></div>
+            <button class="track-close" onclick="closeTrack()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        var TOKEN = localStorage.getItem('sadak_token');
+        if (!TOKEN) location.href = '/';
+
+        var LANGS = [{
+            code: 'en',
+            name: 'English',
+            native: 'English',
+            flag: '🇬🇧'
+        }, {
+            code: 'hi',
+            name: 'Hindi',
+            native: 'हिंदी',
+            flag: '🇮🇳'
+        }, {
+            code: 'ta',
+            name: 'Tamil',
+            native: 'தமிழ்',
+            flag: '🇮🇳'
+        }, {
+            code: 'te',
+            name: 'Telugu',
+            native: 'తెలుగు',
+            flag: '🇮🇳'
+        }, {
+            code: 'kn',
+            name: 'Kannada',
+            native: 'ಕನ್ನಡ',
+            flag: '🇮🇳'
+        }, {
+            code: 'ml',
+            name: 'Malayalam',
+            native: 'മലയാളം',
+            flag: '🇮🇳'
+        }, {
+            code: 'mr',
+            name: 'Marathi',
+            native: 'मराठी',
+            flag: '🇮🇳'
+        }, {
+            code: 'gu',
+            name: 'Gujarati',
+            native: 'ગુજરાતી',
+            flag: '🇮🇳'
+        }, {
+            code: 'bn',
+            name: 'Bengali',
+            native: 'বাংলা',
+            flag: '🇮🇳'
+        }, {
+            code: 'pa',
+            name: 'Punjabi',
+            native: 'ਪੰਜਾਬੀ',
+            flag: '🇮🇳'
+        }, {
+            code: 'or',
+            name: 'Odia',
+            native: 'ଓଡ଼ିଆ',
+            flag: '🇮🇳'
+        }, {
+            code: 'as',
+            name: 'Assamese',
+            native: 'অসমীয়া',
+            flag: '🇮🇳'
+        }, {
+            code: 'ur',
+            name: 'Urdu',
+            native: 'اردو',
+            flag: '🇮🇳'
+        }, ];
+        var curLang = localStorage.getItem('sadak_lang') || 'en';
+
+        var SEV = {
+            CRITICAL: '#f87171',
+            HIGH: '#fb923c',
+            MEDIUM: '#fbbf24',
+            LOW: '#4ade80'
+        };
+        var STAT_CLS = {
+            FILED: 'b-filed',
+            ACKNOWLEDGED: 'b-ack',
+            IN_PROGRESS: 'b-prog',
+            RESOLVED: 'b-done',
+            ESCALATED: 'b-esc'
+        };
+
+        function authFetch(url, opts) {
+            var sep = url.indexOf('?') >= 0 ? '&' : '?';
+            opts = opts || {};
+            opts.headers = opts.headers || {};
+            opts.headers['Authorization'] = 'Bearer ' + TOKEN;
+            return fetch(url + sep + 'token=' + TOKEN, opts);
+        }
+
+        function esc(s) {
+            return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function animNum(id, target) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            var n = 0,
+                step = Math.max(1, Math.ceil(target / 15));
+            var t = setInterval(function() {
+                n = Math.min(n + step, target);
+                el.textContent = n;
+                if (n >= target) clearInterval(t);
+            }, 60);
+        }
+
+        // ── INIT ──────────────────────────────────────────────────
+        async function init() {
+            var h = new Date().getHours();
+            document.getElementById('greetTime').textContent = h < 12 ? 'Good Morning' : h < 17 ? 'Good Afternoon' : 'Good Evening';
+            try {
+                var r = await authFetch('/api/auth/me');
+                if (!r.ok) {
+                    location.href = '/';
+                    return;
+                }
+                var d = await r.json();
+                var u = d.user;
+                var s = d.stats;
+                document.getElementById('greetName').textContent = u.full_name.split(' ')[0];
+                if (u.district) document.getElementById('greetLoc').textContent = u.district + ', ' + u.state;
+                var av = document.getElementById('userAvatar');
+                av.textContent = u.full_name[0].toUpperCase();
+                av.style.background = u.avatar_color || 'var(--navy)';
+                animNum('st-total', s.total || 0);
+                animNum('st-resolved', s.resolved || 0);
+                animNum('st-critical', s.critical || 0);
+                if (u.role === 'admin') {
+                    var ab = document.createElement('div');
+                    ab.onclick = function() {
+                        location.href = '/admin';
+                    };
+                    ab.style.cssText = 'width:30px;height:30px;background:rgba(255,103,31,.2);border:1px solid rgba(255,103,31,.35);border-radius:8px;display:grid;place-items:center;cursor:pointer;font-size:12px';
+                    ab.innerHTML = '⚙️';
+                    ab.title = 'Command Centre';
+                    document.getElementById('userAvatar').parentNode.insertBefore(ab, document.getElementById('userAvatar'));
+                }
+                if (curLang !== 'en') applyLang(curLang);
+                await loadComplaints();
+                loadRQI();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // ── COMPLAINTS ────────────────────────────────────────────
+        async function loadComplaints() {
+            try {
+                var r = await authFetch('/api/complaints?limit=5');
+                var list = await r.json();
+                var el = document.getElementById('compList');
+                if (!list.length) {
+                    el.innerHTML = '<div class="empty"><div class="empty-ic"><svg viewBox="0 0 24 24"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg></div><div class="empty-txt">No complaints filed yet</div><div class="empty-sub">Tap Scan to report your first pothole</div></div>';
+                    return;
+                }
+                el.innerHTML = list.map(function(c) {
+                    var col = SEV[c.severity] || '#9ca3af';
+                    var cls = STAT_CLS[c.status] || 'b-filed';
+                    return '<div class="comp-item" onclick="location.href=\'/history\'">' +
+                        '<div class="sev-bar" style="background:' + col + '"></div>' +
+                        '<div class="comp-body">' +
+                        '<div class="comp-cid">' + esc(c.complaint_id) + '</div>' +
+                        '<div class="comp-desc">' + esc(c.description || 'Pothole reported') + '</div>' +
+                        '<div class="comp-loc">' + esc(c.district) + ', ' + esc(c.state) + '</div>' +
+                        '</div>' +
+                        '<div class="comp-right">' +
+                        '<span class="badge ' + cls + '">' + c.status.replace('_', ' ') + '</span>' +
+                        (c.ai_detected ? '<span class="ai-tag">AI</span>' : '') +
+                        '</div>' +
+                        '</div>';
+                }).join('');
+            } catch (e) {}
+        }
+
+        // ── ROAD QUALITY ──────────────────────────────────────────
+        function loadRQI() {
+            if (!navigator.geolocation) {
+                document.getElementById('rqiMeta').textContent = 'Enable GPS to see road quality';
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(function(pos) {
+                var lat = pos.coords.latitude,
+                    lng = pos.coords.longitude;
+                fetch('https://nominatim.openstreetmap.org/reverse?lat=' + lat + '&lon=' + lng + '&format=json&accept-language=en', {
+                        headers: {
+                            'User-Agent': 'SADAK-AI'
+                        }
+                    })
+                    .then(function(r) {
+                        return r.json();
+                    })
+                    .then(function(data) {
+                        var a = data.address || {};
+                        var dist = (a.county || a.district || '').replace(/ *(District|Taluk)$/i, '').trim();
+                        var state = (a.state || '').trim();
+                        if (!dist || !state) return;
+                        document.getElementById('rqiZone').textContent = dist;
+                        return authFetch('/api/road-quality?district=' + encodeURIComponent(dist) + '&state=' + encodeURIComponent(state));
+                    })
+                    .then(function(r) {
+                        if (r) return r.json();
+                    })
+                    .then(function(d) {
+                        if (!d || !d.score) return;
+                        var score = d.score;
+                        var col = score >= 70 ? '#4ade80' : score >= 40 ? '#fbbf24' : '#f87171';
+                        var grade = d.grade || 'C';
+                        var label = score >= 80 ? 'Excellent roads' : score >= 70 ? 'Good roads' : score >= 40 ? 'Fair condition' : 'Poor — needs repair';
+                        var trend = d.trend || 'stable';
+                        var ti = trend === 'improving' ? '↑ Improving' : trend === 'worsening' ? '↓ Worsening' : '→ Stable';
+                        var tc = trend === 'improving' ? 'rgba(74,222,128,.3)' : trend === 'worsening' ? 'rgba(248,113,113,.3)' : 'rgba(255,255,255,.15)';
+                        document.getElementById('rqiCircle').textContent = score;
+                        document.getElementById('rqiCircle').style.color = col;
+                        document.getElementById('rqiCircle').style.borderColor = col + '44';
+                        document.getElementById('rqiGrade').innerHTML = '<span style="color:#fff">Grade ' + grade + ' — ' + label + '</span><span class="rqi-trend" style="background:' + tc + ';color:' + col + '">' + ti + '</span>';
+                        document.getElementById('rqiBar').style.width = score + '%';
+                        document.getElementById('rqiBar').style.background = col;
+                        var meta = d.total_reports + ' reports · ' + d.resolved_pct + '% resolved';
+                        if (d.critical > 0) meta += ' · ' + d.critical + ' critical';
+                        document.getElementById('rqiMeta').textContent = meta;
+                    })
+                    .catch(function() {
+                        document.getElementById('rqiMeta').textContent = 'Road quality data loading...';
+                    });
+            }, function() {
+                document.getElementById('rqiMeta').textContent = 'Enable location for road quality score';
+            }, {
+                timeout: 8000
+            });
+        }
+
+        // ── LANGUAGE ──────────────────────────────────────────────
+        function openLang() {
+            var html = '';
+            LANGS.forEach(function(l) {
+                html += '<button class="lang-item' + (l.code === curLang ? ' on' : '') + '" onclick="selectLang(\'' + l.code + '\')">' +
+                    '<span class="lang-flag">' + l.flag + '</span>' +
+                    '<span class="lang-name">' + l.name + '</span>' +
+                    '<span class="lang-native">' + l.native + '</span>' +
+                    '<svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>' +
+                    '</button>';
+            });
+            document.getElementById('langList').innerHTML = html;
+            document.getElementById('langModal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLang() {
+            document.getElementById('langModal').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        function selectLang(code) {
+            curLang = code;
+            localStorage.setItem('sadak_lang', code);
+            var l = LANGS.find(function(x) {
+                return x.code === code;
+            }) || LANGS[0];
+            document.getElementById('langFlag').textContent = l.flag;
+            document.getElementById('langName').textContent = code.toUpperCase();
+            closeLang();
+            applyLang(code);
+        }
+
+        function applyLang(code) {
+            var map = {
+                hi: {
+                    scan: 'सड़क स्कैन करें'
+                },
+                ta: {
+                    scan: 'சாலை ஸ்கேன்'
+                },
+                te: {
+                    scan: 'రోడ్ స్కాన్'
+                },
+                kn: {
+                    scan: 'ರಸ್ತೆ ಸ್ಕ್ಯಾನ್'
+                },
+                ml: {
+                    scan: 'റോഡ് സ്കാൻ'
+                },
+                mr: {
+                    scan: 'रस्ता स्कॅन'
+                },
+                gu: {
+                    scan: 'રોડ સ્કેન'
+                },
+                bn: {
+                    scan: 'রাস্তা স্ক্যান'
+                },
+                pa: {
+                    scan: 'ਸੜਕ ਸਕੈਨ'
+                },
+            };
+            var tx = map[code];
+            if (!tx) return;
+            var st = document.querySelector('.sh-title');
+            if (st && tx.scan) st.textContent = tx.scan;
+        }
+
+        // ── TRACK ─────────────────────────────────────────────────
+        function showTrack() {
+            document.getElementById('trackModal').classList.add('open');
+        }
+
+        function closeTrack() {
+            document.getElementById('trackModal').classList.remove('open');
+            document.getElementById('trackRes').classList.remove('show');
+        }
+        async function doTrack() {
+            var cid = document.getElementById('trackInput').value.trim();
+            if (!cid) return;
+            document.getElementById('trackRes').innerHTML = '<div class="sp"></div>';
+            document.getElementById('trackRes').classList.add('show');
+            try {
+                var r = await authFetch('/api/complaints/' + cid);
+                if (!r.ok) {
+                    document.getElementById('trackRes').innerHTML = '<span style="color:#f87171">Complaint not found.</span>';
+                    return;
+                }
+                var c = await r.json();
+                var col = SEV[c.severity] || '#9ca3af';
+                document.getElementById('trackRes').innerHTML =
+                    '<div style="font-size:.62rem;font-family:monospace;color:#93c5fd;margin-bottom:6px">' + esc(c.complaint_id) + '</div>' +
+                    '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">' +
+                    '<span class="badge ' + (STAT_CLS[c.status] || 'b-filed') + '">' + c.status.replace('_', ' ') + '</span>' +
+                    '<span class="badge" style="background:' + col + '22;color:' + col + ';border:1px solid ' + col + '44">' + c.severity + '</span>' +
+                    '</div>' +
+                    '<div style="font-size:.78rem;color:rgba(255,255,255,.7);margin-bottom:3px">' + esc(c.district) + ', ' + esc(c.state) + '</div>' +
+                    '<div style="font-size:.74rem;color:rgba(255,255,255,.5)">Authority: ' + esc(c.authority_name || '—') + '</div>' +
+                    '<div style="font-size:.74rem;color:var(--orange);font-weight:700;margin-top:3px">Helpline: ' + esc(c.helpline || '—') + '</div>';
+            } catch (e) {
+                document.getElementById('trackRes').innerHTML = '<span style="color:#f87171">Error. Try again.</span>';
+            }
+        }
+
+        // ── SSE ───────────────────────────────────────────────────
+        var sse = new EventSource('/api/stream?token=' + TOKEN);
+        sse.onmessage = function(e) {
+            var msg = JSON.parse(e.data);
+            if (msg.type === 'new_complaint' || msg.type === 'stats_updated' || msg.type === 'complaint_updated') init();
+        };
+
+        // ── PWA ───────────────────────────────────────────────────
+        var dP = null;
+        window.addEventListener('beforeinstallprompt', function(e) {
+            e.preventDefault();
+            dP = e;
+            document.getElementById('installBanner').classList.add('show');
+        });
+
+        function installApp() {
+            if (!dP) return;
+            dP.prompt();
+            dP.userChoice.then(function() {
+                dP = null;
+                dismissInstall();
+            });
+        }
+
+        function dismissInstall() {
+            document.getElementById('installBanner').classList.remove('show');
+            dP = null;
+        }
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(function() {});
+
+        init();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,2351 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>SADAK AI — Command Centre</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent
+        }
+        
+        :root {
+            --bg: #0a0f1e;
+            --bg2: #0d1528;
+            --bg3: #111d35;
+            --navy: #0B3D91;
+            --orange: #FF671F;
+            --orange2: #FF8C00;
+            --green: #16a34a;
+            --red: #dc2626;
+            --border: rgba(255, 255, 255, .08);
+            --text: #e2e8f0;
+            --text2: rgba(255, 255, 255, .45);
+        }
+        
+        html,
+        body {
+            height: 100%;
+            background: var(--bg);
+            font-family: 'Inter', sans-serif;
+            color: var(--text);
+            overflow: hidden
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column
+        }
+        /* ══ PIN GATE ══ */
+        
+        #pinGate {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: linear-gradient(160deg, #020a1e 0%, #060f2e 35%, #0B3D91 75%, #1565C0 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity .5s ease;
+        }
+        
+        .pin-card {
+            background: rgba(255, 255, 255, .05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 20px;
+            padding: 36px 32px;
+            width: 340px;
+            text-align: center;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, .4)
+        }
+        
+        .pin-logo {
+            font-size: 1.6rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+            margin-bottom: 4px
+        }
+        
+        .pin-logo .s {
+            color: #FF671F
+        }
+        
+        .pin-logo .a {
+            color: #fff
+        }
+        
+        .pin-sub {
+            font-size: .62rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, .35);
+            margin-bottom: 24px
+        }
+        
+        .pin-shield {
+            width: 60px;
+            height: 60px;
+            background: rgba(11, 61, 145, .4);
+            border: 1.5px solid rgba(255, 255, 255, .12);
+            border-radius: 16px;
+            display: grid;
+            place-items: center;
+            margin: 0 auto 18px
+        }
+        
+        .pin-shield svg {
+            width: 28px;
+            height: 28px;
+            fill: none;
+            stroke: rgba(255, 255, 255, .7);
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+        
+        .pin-title {
+            font-size: .95rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 4px
+        }
+        
+        .pin-hint {
+            font-size: .72rem;
+            color: rgba(255, 255, 255, .4);
+            margin-bottom: 20px;
+            line-height: 1.5
+        }
+        
+        .pin-setup-note {
+            background: rgba(255, 193, 7, .08);
+            border: 1px solid rgba(255, 193, 7, .2);
+            border-radius: 10px;
+            padding: 10px 13px;
+            font-size: .71rem;
+            color: #fde047;
+            margin-bottom: 16px;
+            line-height: 1.5;
+            text-align: left;
+            display: none
+        }
+        
+        .pin-setup-note strong {
+            display: block;
+            margin-bottom: 2px
+        }
+        
+        .pin-dots {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 18px
+        }
+        
+        .pin-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, .2);
+            background: transparent;
+            transition: all .2s
+        }
+        
+        .pin-dot.filled {
+            background: #FF671F;
+            border-color: #FF671F;
+            box-shadow: 0 0 8px rgba(255, 103, 31, .5)
+        }
+        
+        .pin-dot.error {
+            background: #f87171;
+            border-color: #f87171;
+            animation: shake .4s ease
+        }
+        
+        @keyframes shake {
+            0%,
+            100% {
+                transform: translateX(0)
+            }
+            25% {
+                transform: translateX(-6px)
+            }
+            75% {
+                transform: translateX(6px)
+            }
+        }
+        
+        .pin-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 14px
+        }
+        
+        .pk {
+            background: rgba(255, 255, 255, .07);
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            cursor: pointer;
+            transition: all .15s;
+            font-family: 'Inter', sans-serif;
+            -webkit-user-select: none;
+            user-select: none
+        }
+        
+        .pk:hover {
+            background: rgba(255, 255, 255, .14);
+            transform: scale(1.04)
+        }
+        
+        .pk:active {
+            transform: scale(.96)
+        }
+        
+        .pk.pk-del {
+            font-size: .8rem;
+            color: rgba(255, 255, 255, .5)
+        }
+        
+        .pk.pk-zero {
+            grid-column: 2
+        }
+        
+        .pin-err {
+            color: #f87171;
+            font-size: .74rem;
+            font-weight: 600;
+            min-height: 18px;
+            margin-bottom: 8px
+        }
+        
+        .pin-change-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, .3);
+            font-size: .67rem;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            text-decoration: underline;
+            margin-top: 4px
+        }
+        
+        .pin-change-btn:hover {
+            color: rgba(255, 255, 255, .6)
+        }
+        
+        #pinChangeWrap {
+            display: none
+        }
+        /* ══ TOPBAR ══ */
+        
+        .topbar {
+            background: rgba(10, 15, 30, .9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 20px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            z-index: 100;
+            flex-shrink: 0
+        }
+        
+        .logo {
+            font-size: 1.1rem;
+            font-weight: 900;
+            letter-spacing: .5px
+        }
+        
+        .logo .s {
+            color: var(--orange)
+        }
+        
+        .logo .a {
+            color: #fff
+        }
+        
+        .tb-sep {
+            font-size: .78rem;
+            color: var(--text2);
+            font-weight: 500;
+            padding-left: 10px;
+            border-left: 1px solid var(--border)
+        }
+        
+        .tb-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+        
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(74, 222, 128, .1);
+            border: 1px solid rgba(74, 222, 128, .2);
+            border-radius: 20px;
+            padding: 4px 11px;
+            font-size: .65rem;
+            font-weight: 700;
+            color: #4ade80
+        }
+        
+        .live-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #4ade80;
+            animation: blink 1.5s ease-in-out infinite
+        }
+        
+        @keyframes blink {
+            0%,
+            100% {
+                opacity: 1
+            }
+            50% {
+                opacity: .1
+            }
+        }
+        
+        .btn-sm {
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, .06);
+            color: var(--text2);
+            font-size: .72rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all .2s;
+            white-space: nowrap
+        }
+        
+        .btn-sm:hover,
+        .btn-sm.on {
+            background: rgba(255, 255, 255, .14);
+            color: #fff;
+            border-color: rgba(255, 255, 255, .2)
+        }
+        
+        .admin-av {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--orange), var(--orange2));
+            display: grid;
+            place-items: center;
+            font-weight: 900;
+            font-size: .8rem;
+            color: #fff;
+            cursor: pointer;
+            flex-shrink: 0
+        }
+        /* ══ PANELS WRAPPER ══ */
+        
+        .panels-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 0
+        }
+        
+        .panel {
+            display: none;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden
+        }
+        
+        .panel.on {
+            display: flex;
+            flex-direction: column
+        }
+        /* ══ COMPLAINTS PANEL ══ */
+        
+        .main {
+            flex: 1;
+            min-height: 0;
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            overflow: hidden
+        }
+        
+        .left {
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border);
+            background: var(--bg2);
+            overflow: hidden;
+            min-height: 0
+        }
+        
+        .stats-strip {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0
+        }
+        
+        .stat {
+            background: var(--bg2);
+            padding: 10px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: background .15s
+        }
+        
+        .stat:hover {
+            background: var(--bg3)
+        }
+        
+        .stat-n {
+            font-size: 1.3rem;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 2px
+        }
+        
+        .stat-l {
+            font-size: .55rem;
+            font-weight: 700;
+            color: var(--text2);
+            text-transform: uppercase;
+            letter-spacing: .5px
+        }
+        
+        .sn-w {
+            color: #fff
+        }
+        
+        .sn-a {
+            color: #fbbf24
+        }
+        
+        .sn-r {
+            color: #f87171
+        }
+        
+        .sn-g {
+            color: #4ade80
+        }
+        
+        .filter-bar {
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap
+        }
+        
+        .fpill {
+            padding: 5px 10px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, .04);
+            color: var(--text2);
+            font-size: .67rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .18s;
+            font-family: 'Inter', sans-serif
+        }
+        
+        .fpill:hover {
+            background: rgba(255, 255, 255, .09)
+        }
+        
+        .fpill.on {
+            background: var(--orange);
+            border-color: var(--orange);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(255, 103, 31, .35)
+        }
+        
+        .search-bar {
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0
+        }
+        
+        .search-wrap {
+            position: relative
+        }
+        
+        .search-input {
+            width: 100%;
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 7px 10px 7px 30px;
+            font-size: .78rem;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            outline: none
+        }
+        
+        .search-input:focus {
+            border-color: rgba(255, 255, 255, .2)
+        }
+        
+        .search-input::placeholder {
+            color: var(--text2)
+        }
+        
+        .search-ic {
+            position: absolute;
+            left: 9px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: .35
+        }
+        
+        .search-ic svg {
+            width: 13px;
+            height: 13px;
+            fill: none;
+            stroke: #fff;
+            stroke-width: 2;
+            stroke-linecap: round
+        }
+        
+        .comp-list {
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0
+        }
+        
+        .comp-list::-webkit-scrollbar {
+            width: 3px
+        }
+        
+        .comp-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, .12);
+            border-radius: 2px
+        }
+        
+        .citem {
+            padding: 11px 12px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background .15s;
+            display: flex;
+            gap: 9px;
+            align-items: flex-start;
+            position: relative
+        }
+        
+        .citem::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            border-radius: 0 2px 2px 0
+        }
+        
+        .citem:hover,
+        .citem.sel {
+            background: rgba(255, 255, 255, .04)
+        }
+        
+        .citem.sel::before {
+            background: var(--orange)
+        }
+        
+        .citem-sev {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 4px
+        }
+        
+        .citem-body {
+            flex: 1;
+            min-width: 0
+        }
+        
+        .citem-id {
+            font-size: .58rem;
+            font-family: monospace;
+            color: rgba(99, 179, 237, .8);
+            margin-bottom: 2px;
+            font-weight: 600
+        }
+        
+        .citem-desc {
+            font-size: .77rem;
+            font-weight: 600;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 2px
+        }
+        
+        .citem-loc {
+            font-size: .64rem;
+            color: var(--text2)
+        }
+        
+        .citem-meta {
+            display: flex;
+            gap: 5px;
+            margin-top: 4px;
+            flex-wrap: wrap
+        }
+        
+        .cbadge {
+            font-size: .55rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 8px
+        }
+        
+        .cb-filed {
+            background: rgba(59, 130, 246, .2);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, .2)
+        }
+        
+        .cb-ack {
+            background: rgba(251, 191, 36, .15);
+            color: #fde047;
+            border: 1px solid rgba(251, 191, 36, .2)
+        }
+        
+        .cb-prog {
+            background: rgba(249, 115, 22, .15);
+            color: #fb923c;
+            border: 1px solid rgba(249, 115, 22, .2)
+        }
+        
+        .cb-done {
+            background: rgba(74, 222, 128, .15);
+            color: #4ade80;
+            border: 1px solid rgba(74, 222, 128, .2)
+        }
+        
+        .cb-esc {
+            background: rgba(248, 113, 113, .15);
+            color: #f87171;
+            border: 1px solid rgba(248, 113, 113, .2)
+        }
+        
+        .cb-ai {
+            background: rgba(139, 92, 246, .2);
+            color: #c4b5fd;
+            border: 1px solid rgba(139, 92, 246, .2)
+        }
+        
+        .citem-right {
+            flex-shrink: 0;
+            text-align: right
+        }
+        
+        .citem-date {
+            font-size: .6rem;
+            color: var(--text2)
+        }
+        
+        .citem-new {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--orange);
+            margin-top: 4px;
+            margin-left: auto;
+            animation: blink 2s ease-in-out infinite
+        }
+        
+        .export-bar {
+            padding: 7px 12px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+            background: var(--bg2)
+        }
+        
+        .exp-stat {
+            font-size: .65rem;
+            color: var(--text2);
+            flex: 1
+        }
+        
+        .exp-stat b {
+            color: #fff
+        }
+        
+        .empty-list {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text2)
+        }
+        
+        .empty-list svg {
+            width: 36px;
+            height: 36px;
+            fill: none;
+            stroke: var(--text2);
+            stroke-width: 1.5;
+            margin-bottom: 10px;
+            display: block;
+            margin: 0 auto 10px
+        }
+        
+        .right {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden
+        }
+        
+        #map {
+            flex: 1;
+            min-height: 0;
+            position: relative;
+            z-index: 1
+        }
+        
+        .map-overlay {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 1000;
+            display: flex;
+            gap: 8px
+        }
+        
+        .map-btn {
+            background: rgba(10, 15, 30, .85);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: .7rem;
+            font-weight: 600;
+            color: var(--text2);
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all .18s
+        }
+        
+        .map-btn:hover,
+        .map-btn.on {
+            background: rgba(255, 255, 255, .1);
+            color: #fff
+        }
+        
+        .detail {
+            flex-shrink: 0;
+            background: var(--bg2);
+            border-top: 1px solid var(--border);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .35s ease
+        }
+        
+        .detail.open {
+            max-height: 320px
+        }
+        
+        .detail-inner {
+            padding: 16px 20px;
+            overflow-y: auto;
+            height: 100%
+        }
+        
+        .detail-inner::-webkit-scrollbar {
+            width: 3px
+        }
+        
+        .detail-inner::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, .12);
+            border-radius: 2px
+        }
+        
+        .d-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px
+        }
+        
+        .d-id {
+            font-size: .62rem;
+            font-family: monospace;
+            color: rgba(99, 179, 237, .8);
+            font-weight: 700;
+            margin-bottom: 3px
+        }
+        
+        .d-title {
+            font-size: .94rem;
+            font-weight: 800;
+            color: #fff
+        }
+        
+        .d-close {
+            margin-left: auto;
+            width: 26px;
+            height: 26px;
+            border-radius: 7px;
+            background: rgba(255, 255, 255, .07);
+            border: none;
+            color: var(--text2);
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            font-size: .8rem
+        }
+        
+        .d-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 12px
+        }
+        
+        .d-cell {
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 10px
+        }
+        
+        .d-lbl {
+            font-size: .55rem;
+            font-weight: 700;
+            color: var(--text2);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 3px
+        }
+        
+        .d-val {
+            font-size: .79rem;
+            font-weight: 700;
+            color: #fff
+        }
+        
+        .d-lbl2 {
+            font-size: .62rem;
+            font-weight: 700;
+            color: var(--text2);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 6px
+        }
+        
+        .status-btns {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 10px
+        }
+        
+        .sbtn {
+            padding: 8px 13px;
+            border-radius: 9px;
+            border: 1.5px solid;
+            font-size: .73rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all .18s;
+            display: flex;
+            align-items: center;
+            gap: 5px
+        }
+        
+        .sbtn:hover {
+            filter: brightness(1.15);
+            transform: translateY(-1px)
+        }
+        
+        .sbtn:active {
+            transform: scale(.97)
+        }
+        
+        .sbtn-ack {
+            background: rgba(251, 191, 36, .1);
+            border-color: rgba(251, 191, 36, .35);
+            color: #fde047
+        }
+        
+        .sbtn-prog {
+            background: rgba(249, 115, 22, .1);
+            border-color: rgba(249, 115, 22, .35);
+            color: #fb923c
+        }
+        
+        .sbtn-res {
+            background: rgba(74, 222, 128, .1);
+            border-color: rgba(74, 222, 128, .35);
+            color: #4ade80
+        }
+        
+        .sbtn-esc {
+            background: rgba(248, 113, 113, .1);
+            border-color: rgba(248, 113, 113, .35);
+            color: #f87171
+        }
+        
+        .sbtn.act-s {
+            filter: brightness(1.3);
+            box-shadow: 0 0 12px rgba(255, 255, 255, .12)
+        }
+        
+        .d-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap
+        }
+        
+        .note-input {
+            flex: 1;
+            min-width: 180px;
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: .78rem;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            outline: none
+        }
+        
+        .note-input:focus {
+            border-color: rgba(255, 255, 255, .2)
+        }
+        
+        .note-input::placeholder {
+            color: var(--text2)
+        }
+        
+        .pdf-btn {
+            padding: 8px 13px;
+            border-radius: 9px;
+            background: var(--navy);
+            color: #fff;
+            border: none;
+            font-size: .73rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all .18s
+        }
+        
+        .pdf-btn:hover {
+            background: #1565C0
+        }
+        
+        .pdf-btn svg {
+            width: 13px;
+            height: 13px;
+            fill: none;
+            stroke: #fff;
+            stroke-width: 2.5;
+            stroke-linecap: round
+        }
+        /* ══ USERS PANEL ══ */
+        
+        .users-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            background: var(--bg)
+        }
+        
+        .users-hdr {
+            background: var(--bg2);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0
+        }
+        
+        .users-hdr-title {
+            font-size: .92rem;
+            font-weight: 800;
+            color: #fff
+        }
+        
+        .users-hdr-sub {
+            font-size: .7rem;
+            color: var(--text2);
+            margin-top: 2px
+        }
+        
+        .users-search-wrap {
+            position: relative;
+            margin-left: auto;
+            flex-shrink: 0
+        }
+        
+        .users-search {
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 7px 12px 7px 32px;
+            font-size: .78rem;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            width: 220px
+        }
+        
+        .users-search:focus {
+            border-color: rgba(255, 255, 255, .2)
+        }
+        
+        .users-search::placeholder {
+            color: var(--text2)
+        }
+        
+        .users-search-ic {
+            position: absolute;
+            left: 9px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: .35
+        }
+        
+        .users-search-ic svg {
+            width: 13px;
+            height: 13px;
+            fill: none;
+            stroke: #fff;
+            stroke-width: 2;
+            stroke-linecap: round
+        }
+        
+        .users-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            min-height: 0
+        }
+        
+        .users-body::-webkit-scrollbar {
+            width: 4px
+        }
+        
+        .users-body::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, .12);
+            border-radius: 2px
+        }
+        
+        .u-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 16px
+        }
+        
+        .us-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center
+        }
+        
+        .us-num {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: #fff;
+            line-height: 1;
+            margin-bottom: 2px
+        }
+        
+        .us-lbl {
+            font-size: .58rem;
+            font-weight: 700;
+            color: var(--text2);
+            text-transform: uppercase;
+            letter-spacing: .5px
+        }
+        
+        .u-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            overflow: hidden;
+            transition: border-color .2s
+        }
+        
+        .u-card:hover {
+            border-color: rgba(255, 255, 255, .18)
+        }
+        
+        .u-card-main {
+            padding: 13px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+        
+        .u-av {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            font-size: 1rem;
+            font-weight: 900;
+            color: #fff;
+            flex-shrink: 0;
+            border: 1.5px solid rgba(255, 255, 255, .15)
+        }
+        
+        .u-name {
+            font-size: .86rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+        
+        .u-email {
+            font-size: .7rem;
+            color: var(--text2);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+        
+        .u-meta {
+            font-size: .65rem;
+            color: var(--text2);
+            margin-top: 3px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap
+        }
+        
+        .u-info {
+            flex: 1;
+            min-width: 0
+        }
+        
+        .u-role {
+            font-size: .58rem;
+            font-weight: 800;
+            padding: 3px 9px;
+            border-radius: 8px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            flex-shrink: 0;
+            align-self: center
+        }
+        
+        .rb-admin {
+            background: rgba(255, 103, 31, .2);
+            color: #fb923c;
+            border: 1px solid rgba(255, 103, 31, .3)
+        }
+        
+        .rb-citizen {
+            background: rgba(59, 130, 246, .15);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, .2)
+        }
+        
+        .rb-suspended {
+            background: rgba(248, 113, 113, .15);
+            color: #f87171;
+            border: 1px solid rgba(248, 113, 113, .2)
+        }
+        
+        .u-actions {
+            padding: 0 14px 12px;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap
+        }
+        
+        .ua {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid;
+            font-size: .7rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all .18s;
+            display: flex;
+            align-items: center;
+            gap: 4px
+        }
+        
+        .ua:active {
+            transform: scale(.96)
+        }
+        
+        .ua-del {
+            background: rgba(248, 113, 113, .08);
+            border-color: rgba(248, 113, 113, .3);
+            color: #f87171
+        }
+        
+        .ua-del:hover {
+            background: rgba(248, 113, 113, .18)
+        }
+        
+        .ua-sus {
+            background: rgba(251, 191, 36, .08);
+            border-color: rgba(251, 191, 36, .25);
+            color: #fde047
+        }
+        
+        .ua-sus:hover {
+            background: rgba(251, 191, 36, .18)
+        }
+        
+        .ua-act {
+            background: rgba(74, 222, 128, .08);
+            border-color: rgba(74, 222, 128, .25);
+            color: #4ade80
+        }
+        
+        .ua-act:hover {
+            background: rgba(74, 222, 128, .18)
+        }
+        
+        .ua-adm {
+            background: rgba(139, 92, 246, .08);
+            border-color: rgba(139, 92, 246, .25);
+            color: #c4b5fd
+        }
+        
+        .ua-adm:hover {
+            background: rgba(139, 92, 246, .18)
+        }
+        /* ══ DELETE CONFIRM ══ */
+        
+        .del-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 8000;
+            background: rgba(0, 0, 0, .75);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center
+        }
+        
+        .del-overlay.open {
+            display: flex
+        }
+        
+        .del-box {
+            background: var(--bg2);
+            border: 1px solid rgba(248, 113, 113, .3);
+            border-radius: 16px;
+            padding: 28px 24px;
+            width: 320px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, .5)
+        }
+        
+        .del-icon {
+            font-size: 2.2rem;
+            margin-bottom: 12px
+        }
+        
+        .del-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #f87171;
+            margin-bottom: 6px
+        }
+        
+        .del-sub {
+            font-size: .78rem;
+            color: var(--text2);
+            line-height: 1.6;
+            margin-bottom: 20px
+        }
+        
+        .del-name {
+            color: #fff;
+            font-weight: 700
+        }
+        
+        .del-btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px
+        }
+        
+        .del-yes {
+            background: #dc2626;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: .85rem;
+            font-weight: 700;
+            cursor: pointer
+        }
+        
+        .del-yes:hover {
+            background: #b91c1c
+        }
+        
+        .del-no {
+            background: rgba(255, 255, 255, .08);
+            color: rgba(255, 255, 255, .6);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: .85rem;
+            cursor: pointer
+        }
+        /* ══ TOAST ══ */
+        
+        .toast {
+            position: fixed;
+            top: 64px;
+            right: 20px;
+            z-index: 9000;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 11px 18px;
+            font-size: .78rem;
+            font-weight: 600;
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .4);
+            opacity: 0;
+            transform: translateY(-8px);
+            transition: all .25s ease;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0)
+        }
+        
+        .toast.ok {
+            border-color: rgba(74, 222, 128, .3);
+            background: rgba(20, 60, 40, .95)
+        }
+        
+        .toast.err {
+            border-color: rgba(248, 113, 113, .3);
+            background: rgba(80, 20, 20, .95)
+        }
+        
+        .toast.info {
+            border-color: rgba(59, 130, 246, .3);
+            background: rgba(20, 40, 80, .95)
+        }
+        /* MISC */
+        
+        .spin {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, .12);
+            border-top-color: rgba(255, 255, 255, .7);
+            border-radius: 50%;
+            animation: spin .65s linear infinite;
+            margin: 30px auto;
+            display: block
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+        
+        .lm {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2.5px solid rgba(255, 255, 255, .5);
+            display: grid;
+            place-items: center;
+            font-size: .55rem;
+            font-weight: 900;
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .4)
+        }
+        
+        .lm-critical {
+            background: #dc2626
+        }
+        
+        .lm-high {
+            background: #f97316
+        }
+        
+        .lm-medium {
+            background: #ca8a04
+        }
+        
+        .lm-low {
+            background: #16a34a
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ══ PIN GATE ══ -->
+    <div id="pinGate">
+        <div class="pin-card">
+            <div class="pin-logo"><span class="s">SADAK</span><span class="a">AI</span></div>
+            <div class="pin-sub">Command Centre</div>
+            <div class="pin-shield"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+
+            <!-- STEP 1: Email entry (shown first) -->
+            <div id="gateEmail">
+                <div class="pin-title">Admin Sign In</div>
+                <div class="pin-hint">Enter your admin email address</div>
+                <div style="margin-bottom:14px;position:relative">
+                    <input id="adminEmail" type="email" placeholder="admin@email.com" autocomplete="email" style="width:100%;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.18);border-radius:10px;padding:12px 14px;font-size:.88rem;color:#fff;font-family:Inter,sans-serif;outline:none;text-align:center"
+                        onfocus="this.style.borderColor='#FF671F'" onblur="this.style.borderColor='rgba(255,255,255,.18)'" onkeydown="if(event.key==='Enter')proceedToPin()">
+                </div>
+                <div class="pin-err" id="emailErr"></div>
+                <button onclick="proceedToPin()" style="width:100%;background:linear-gradient(90deg,#FF671F,#FF8C00);color:#fff;border:none;border-radius:10px;padding:12px;font-family:Inter,sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;margin-bottom:8px">
+        Continue →
+      </button>
+            </div>
+
+            <!-- STEP 2: PIN entry (shown after email) -->
+            <div id="gatePIN" style="display:none">
+                <div class="pin-title" id="pinTitle">Enter PIN</div>
+                <div class="pin-hint" id="pinHint">Enter your 4-digit admin PIN</div>
+                <div class="pin-setup-note" id="pinSetupNote"><strong>🔐 First Time Setup</strong> Choose a 4-digit PIN you will use every time.</div>
+                <div class="pin-dots">
+                    <div class="pin-dot" id="pd0"></div>
+                    <div class="pin-dot" id="pd1"></div>
+                    <div class="pin-dot" id="pd2"></div>
+                    <div class="pin-dot" id="pd3"></div>
+                </div>
+                <div class="pin-err" id="pinErr"></div>
+                <div class="pin-pad">
+                    <button class="pk" onclick="pinKey('1')">1</button>
+                    <button class="pk" onclick="pinKey('2')">2</button>
+                    <button class="pk" onclick="pinKey('3')">3</button>
+                    <button class="pk" onclick="pinKey('4')">4</button>
+                    <button class="pk" onclick="pinKey('5')">5</button>
+                    <button class="pk" onclick="pinKey('6')">6</button>
+                    <button class="pk" onclick="pinKey('7')">7</button>
+                    <button class="pk" onclick="pinKey('8')">8</button>
+                    <button class="pk" onclick="pinKey('9')">9</button>
+                    <button class="pk pk-zero" onclick="pinKey('0')">0</button>
+                    <button class="pk pk-del" onclick="pinDel()">⌫</button>
+                </div>
+                <button onclick="backToEmail()" style="background:none;border:none;color:rgba(255,255,255,.35);font-size:.7rem;cursor:pointer;font-family:Inter,sans-serif;margin-top:4px">← Change email</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ TOAST ══ -->
+    <div class="toast" id="toast"></div>
+
+    <!-- ══ TOPBAR ══ -->
+    <div class="topbar">
+        <div class="logo"><span class="s">SADAK</span><span class="a">AI</span></div>
+        <div class="tb-sep">Command Centre</div>
+        <div class="tb-right">
+            <div class="live-badge">
+                <div class="live-dot"></div>LIVE</div>
+            <button class="btn-sm" onclick="exportCSV()">⬇ CSV</button>
+            <button class="btn-sm on" id="tb-complaints" onclick="showTab('complaints')">📋 Complaints</button>
+            <button class="btn-sm" id="tb-users" onclick="showTab('users')">👥 Users</button>
+            <button class="btn-sm" onclick="location.href='/home'">🏠 Home</button>
+            <div class="admin-av" id="adminAv">A</div>
+        </div>
+    </div>
+
+    <!-- ══ PANELS ══ -->
+    <div class="panels-wrap">
+
+        <!-- COMPLAINTS PANEL -->
+        <div class="panel on" id="panel-complaints">
+            <div class="main">
+                <!-- LEFT -->
+                <div class="left">
+                    <div class="stats-strip">
+                        <div class="stat" onclick="applyFilter(null)">
+                            <div class="stat-n sn-w" id="st-total">—</div>
+                            <div class="stat-l">Total</div>
+                        </div>
+                        <div class="stat" onclick="applyFilter('CRITICAL','severity')">
+                            <div class="stat-n sn-r" id="st-critical">—</div>
+                            <div class="stat-l">Critical</div>
+                        </div>
+                        <div class="stat" onclick="applyFilter('FILED','status')">
+                            <div class="stat-n sn-a" id="st-pending">—</div>
+                            <div class="stat-l">Pending</div>
+                        </div>
+                        <div class="stat" onclick="applyFilter('RESOLVED','status')">
+                            <div class="stat-n sn-g" id="st-resolved">—</div>
+                            <div class="stat-l">Resolved</div>
+                        </div>
+                    </div>
+                    <div class="search-bar">
+                        <div class="search-wrap">
+                            <div class="search-ic"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></div>
+                            <input class="search-input" id="searchInput" placeholder="Search ID, location, description..." oninput="doSearch()">
+                        </div>
+                    </div>
+                    <div class="filter-bar">
+                        <button class="fpill on" id="fp-all" onclick="applyFilter(null)">All</button>
+                        <button class="fpill" id="fp-filed" onclick="applyFilter('FILED','status')">Filed</button>
+                        <button class="fpill" id="fp-ack" onclick="applyFilter('ACKNOWLEDGED','status')">Acknowledged</button>
+                        <button class="fpill" id="fp-prog" onclick="applyFilter('IN_PROGRESS','status')">In Progress</button>
+                        <button class="fpill" id="fp-esc" onclick="applyFilter('ESCALATED','status')">Escalated</button>
+                        <button class="fpill" id="fp-done" onclick="applyFilter('RESOLVED','status')">Resolved</button>
+                        <button class="fpill" id="fp-crit" onclick="applyFilter('CRITICAL','severity')">Critical</button>
+                    </div>
+                    <div class="comp-list" id="compList">
+                        <div class="spin"></div>
+                    </div>
+                    <div class="export-bar">
+                        <div class="exp-stat">Showing <b id="showCount">0</b> of <b id="totalCount">0</b></div>
+                        <button class="btn-sm" onclick="loadData()">↻</button>
+                    </div>
+                </div>
+                <!-- RIGHT: MAP + DETAIL -->
+                <div class="right">
+                    <div id="map" style="position:relative">
+                        <div class="map-overlay">
+                            <button class="map-btn on" id="mb-all" onclick="setMapMode('all')">All Pins</button>
+                            <button class="map-btn" id="mb-crit" onclick="setMapMode('critical')">Critical</button>
+                            <button class="map-btn" id="mb-pend" onclick="setMapMode('pending')">Pending</button>
+                        </div>
+                    </div>
+                    <div class="detail" id="detailPanel">
+                        <div class="detail-inner" id="detailInner"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- USERS PANEL -->
+        <div class="panel" id="panel-users">
+            <div class="users-panel">
+                <div class="users-hdr">
+                    <div>
+                        <div class="users-hdr-title">👥 User Management</div>
+                        <div class="users-hdr-sub">View, suspend or delete citizen accounts</div>
+                    </div>
+                    <div class="users-search-wrap">
+                        <div class="users-search-ic"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></div>
+                        <input class="users-search" id="userSearch" placeholder="Search name or email..." oninput="filterUsers()">
+                    </div>
+                </div>
+                <div class="users-body">
+                    <div class="u-stats">
+                        <div class="us-card">
+                            <div class="us-num" id="u-total">—</div>
+                            <div class="us-lbl">Total</div>
+                        </div>
+                        <div class="us-card">
+                            <div class="us-num" style="color:#4ade80" id="u-active">—</div>
+                            <div class="us-lbl">Active</div>
+                        </div>
+                        <div class="us-card">
+                            <div class="us-num" style="color:#f87171" id="u-susp">—</div>
+                            <div class="us-lbl">Suspended</div>
+                        </div>
+                        <div class="us-card">
+                            <div class="us-num" style="color:#fb923c" id="u-admins">—</div>
+                            <div class="us-lbl">Admins</div>
+                        </div>
+                    </div>
+                    <div id="userList">
+                        <div class="spin"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!-- end panels-wrap -->
+
+    <!-- DELETE CONFIRM -->
+    <div class="del-overlay" id="delOverlay" onclick="if(event.target===this)closeDelConfirm()">
+        <div class="del-box">
+            <div class="del-icon">🗑️</div>
+            <div class="del-title">Delete Account?</div>
+            <div class="del-sub">Permanently delete <span class="del-name" id="delName"></span>.<br>Their <strong id="delCount"></strong> complaints will also be deleted.<br><br>They must register again to use SADAK AI.<br><strong style="color:#f87171">This cannot be undone.</strong></div>
+            <div class="del-btns">
+                <button class="del-yes" onclick="confirmDelete()">Yes, Delete</button>
+                <button class="del-no" onclick="closeDelConfirm()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ═══════════════════════════════════════════
+           SADAK AI — Admin Command Centre
+           Clean rewrite — no accumulated bugs
+        ═══════════════════════════════════════════ */
+
+        // ── GLOBALS ──────────────────────────────────────────────
+        var TOKEN = localStorage.getItem('sadak_token') || '';
+        // Auth handled entirely by initPinGate — no sync redirects
+        var allData = [],
+            filteredData = [],
+            curFilter = {},
+            curCid = null,
+            mapMode = 'all';
+        var allUsers = [],
+            delTarget = null;
+        var SEV_COL = {
+            CRITICAL: '#dc2626',
+            HIGH: '#f97316',
+            MEDIUM: '#ca8a04',
+            LOW: '#16a34a'
+        };
+        var STAT_CLS = {
+            FILED: 'cb-filed',
+            ACKNOWLEDGED: 'cb-ack',
+            IN_PROGRESS: 'cb-prog',
+            RESOLVED: 'cb-done',
+            ESCALATED: 'cb-esc'
+        };
+
+        // ── AUTH FETCH ────────────────────────────────────────────
+        function authFetch(url, opts) {
+            var sep = url.indexOf('?') >= 0 ? '&' : '?';
+            opts = opts || {};
+            opts.headers = opts.headers || {};
+            opts.headers['Authorization'] = 'Bearer ' + TOKEN;
+            return fetch(url + sep + 'token=' + TOKEN, opts);
+        }
+
+        function esc(s) {
+            return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        // ── ADMIN DIRECT LOGIN ───────────────────────────────────
+        // No citizen login needed — email + PIN directly
+
+        var adminEmail_val = '';
+        var pinMode = 'verify'; // verify | setup | confirm | change
+        var pinValue = '',
+            pinFirst = '',
+            pinTries = 0;
+
+        // Called on page load — check if already have valid admin token
+        async function initPinGate() {
+            var existing = localStorage.getItem('sadak_token');
+            if (existing) {
+                try {
+                    var r = await fetch('/api/auth/verify?token=' + existing);
+                    var d = await r.json();
+                    if (d.valid && ((d.user || {}).role === 'admin' || (d.user || {}).role === 'authority')) {
+                        TOKEN = existing;
+                        document.getElementById('adminAv').textContent = ((d.user || {}).name || 'A')[0].toUpperCase();
+                        // Check if PIN needed for this session
+                        var hasPinR = await fetch('/api/admin/has-pin?token=' + existing, {
+                            headers: {
+                                'Authorization': 'Bearer ' + existing
+                            }
+                        });
+                        var hasPinD = await hasPinR.json();
+                        if (hasPinD.has_pin) {
+                            // Already admin + has PIN set — skip email, go straight to PIN
+                            adminEmail_val = (d.user || {}).email || '';
+                            showPINStep();
+                            return;
+                        }
+                        // Admin but no PIN yet — show email pre-filled, go to setup
+                        document.getElementById('adminEmail').value = (d.user || {}).email || '';
+                        return;
+                    }
+                } catch (e) {}
+            }
+            // Show email step (default)
+            document.getElementById('adminEmail').focus();
+        }
+
+        function backToEmail() {
+            document.getElementById('gatePIN').style.display = 'none';
+            document.getElementById('gateEmail').style.display = 'block';
+            pinValue = '';
+            pinFirst = '';
+            updateDots();
+            document.getElementById('pinErr').textContent = '';
+        }
+
+        async function proceedToPin() {
+            var email = document.getElementById('adminEmail').value.trim().toLowerCase();
+            document.getElementById('emailErr').textContent = '';
+            if (!email || email.indexOf('@') < 1) {
+                document.getElementById('emailErr').textContent = 'Enter a valid email address.';
+                return;
+            }
+
+            // Check if this email is an admin
+            try {
+                var r = await fetch('/api/admin/check-email?email=' + encodeURIComponent(email));
+                var d = await r.json();
+                if (!d.is_admin) {
+                    document.getElementById('emailErr').textContent = d.error || 'This email does not have admin access.';
+                    return;
+                }
+                adminEmail_val = email;
+                // Check if first-time PIN setup
+                if (!d.has_pin) {
+                    pinMode = 'setup';
+                    document.getElementById('pinTitle').textContent = 'Set Your Admin PIN';
+                    document.getElementById('pinHint').textContent = 'Choose a 4-digit PIN for Command Centre access';
+                    document.getElementById('pinSetupNote').style.display = 'block';
+                } else {
+                    pinMode = 'verify';
+                    document.getElementById('pinTitle').textContent = 'Enter PIN';
+                    document.getElementById('pinHint').textContent = 'Welcome back! Enter your 4-digit PIN';
+                    document.getElementById('pinSetupNote').style.display = 'none';
+                }
+                showPINStep();
+            } catch (e) {
+                document.getElementById('emailErr').textContent = 'Network error. Check connection.';
+            }
+        }
+
+        function showPINStep() {
+            document.getElementById('gateEmail').style.display = 'none';
+            document.getElementById('gatePIN').style.display = 'block';
+            pinValue = '';
+            updateDots();
+        }
+
+        // ── NUMPAD ────────────────────────────────────────────────
+        function pinKey(d) {
+            if (pinValue.length >= 4) return;
+            pinValue += d;
+            updateDots();
+            if (pinValue.length === 4) setTimeout(submitPIN, 180);
+        }
+
+        function pinDel() {
+            pinValue = pinValue.slice(0, -1);
+            updateDots();
+            document.getElementById('pinErr').textContent = '';
+        }
+
+        function updateDots() {
+            for (var i = 0; i < 4; i++) {
+                var el = document.getElementById('pd' + i);
+                if (!el) return;
+                el.classList.toggle('filled', i < pinValue.length);
+                el.classList.remove('error');
+            }
+        }
+
+        function flashErr(msg) {
+            document.getElementById('pinErr').textContent = msg;
+            for (var i = 0; i < 4; i++) {
+                var el = document.getElementById('pd' + i);
+                if (el) el.classList.add('error');
+            }
+            setTimeout(function() {
+                pinValue = '';
+                updateDots();
+            }, 700);
+        }
+
+        async function submitPIN() {
+            if (pinMode === 'setup') {
+                pinFirst = pinValue;
+                pinValue = '';
+                updateDots();
+                document.getElementById('pinTitle').textContent = 'Confirm PIN';
+                document.getElementById('pinHint').textContent = 'Re-enter the same PIN to confirm';
+                document.getElementById('pinSetupNote').style.display = 'none';
+                pinMode = 'confirm';
+                return;
+            }
+            if (pinMode === 'confirm') {
+                if (pinValue !== pinFirst) {
+                    flashErr('PINs do not match. Try again.');
+                    pinMode = 'setup';
+                    pinFirst = '';
+                    setTimeout(function() {
+                        document.getElementById('pinTitle').textContent = 'Set Your Admin PIN';
+                        document.getElementById('pinSetupNote').style.display = 'block';
+                    }, 800);
+                    return;
+                }
+                // First login — use admin/login which sets PIN + returns token
+                await doAdminLogin(pinValue);
+                return;
+            }
+            if (pinMode === 'change') {
+                pinFirst = pinValue;
+                pinValue = '';
+                updateDots();
+                document.getElementById('pinTitle').textContent = 'Confirm New PIN';
+                document.getElementById('pinHint').textContent = 'Re-enter the new PIN';
+                pinMode = 'confirm';
+                return;
+            }
+            // Verify mode — direct admin login
+            await doAdminLogin(pinValue);
+        }
+
+        async function doAdminLogin(pin) {
+            try {
+                var r = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: adminEmail_val,
+                        pin: pin
+                    })
+                });
+                var d = await r.json();
+                if (!d.success) {
+                    pinTries++;
+                    if (pinTries >= 5) {
+                        document.getElementById('pinErr').textContent = '🔒 Too many attempts. Try again later.';
+                        setTimeout(backToEmail, 2000);
+                        return;
+                    }
+                    flashErr(d.error || ('Wrong PIN. ' + (5 - pinTries) + ' attempt(s) left.'));
+                    return;
+                }
+                // Success — store token and open command centre
+                TOKEN = d.token;
+                localStorage.setItem('sadak_token', d.token);
+                document.cookie = 'sadak_token=' + d.token + '; path=/; SameSite=Lax; max-age=' + (30 * 24 * 3600);
+                var name = (d.user || {}).full_name || 'Admin';
+                document.getElementById('adminAv').textContent = name[0].toUpperCase();
+                openCentre();
+            } catch (e) {
+                flashErr('Network error. Try again.');
+            }
+        }
+
+        function openCentre() {
+            var g = document.getElementById('pinGate');
+            g.style.opacity = '0';
+            setTimeout(function() {
+                g.style.display = 'none';
+            }, 600);
+            loadData();
+        }
+
+        function startChangePin() {
+            pinMode = 'change';
+            pinValue = '';
+            pinFirst = '';
+            updateDots();
+            document.getElementById('pinTitle').textContent = 'Enter New PIN';
+            document.getElementById('pinHint').textContent = 'Choose a new 4-digit PIN';
+            document.getElementById('pinErr').textContent = '';
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (!document.getElementById('pinGate') || document.getElementById('pinGate').style.display === 'none') return;
+            var pinShown = document.getElementById('gatePIN').style.display !== 'none';
+            if (pinShown) {
+                if (e.key >= '0' && e.key <= '9') pinKey(e.key);
+                else if (e.key === 'Backspace') pinDel();
+            }
+        });
+
+        // ── TAB SWITCHING ─────────────────────────────────────────
+        function showTab(t) {
+            document.getElementById('panel-complaints').classList.toggle('on', t === 'complaints');
+            document.getElementById('panel-users').classList.toggle('on', t === 'users');
+            document.getElementById('tb-complaints').classList.toggle('on', t === 'complaints');
+            document.getElementById('tb-users').classList.toggle('on', t === 'users');
+            if (t === 'users') loadUsers();
+        }
+
+        // ── MAP ───────────────────────────────────────────────────
+        var map = L.map('map', {
+            zoomControl: true
+        }).setView([20.5937, 78.9629], 5);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '© OSM © CartoDB',
+            maxZoom: 18
+        }).addTo(map);
+        var mLayer = L.layerGroup().addTo(map),
+            mPins = {};
+
+        function addPin(c) {
+            if (!c.latitude || !c.longitude) return;
+            var sc = (c.severity || 'medium').toLowerCase();
+            var icon = L.divIcon({
+                className: '',
+                html: '<div class="lm lm-' + sc + '">' + (c.severity || 'M')[0] + '</div>',
+                iconSize: [24, 24],
+                iconAnchor: [12, 12]
+            });
+            var m = L.marker([c.latitude, c.longitude], {
+                icon: icon
+            }).addTo(mLayer);
+            m.bindPopup(
+                '<div style="font-family:Inter,sans-serif;min-width:170px">' +
+                '<div style="font-size:.62rem;font-family:monospace;color:#3b82f6;margin-bottom:3px">' + esc(c.complaint_id) + '</div>' +
+                '<div style="font-size:.82rem;font-weight:700;margin-bottom:3px">' + esc(c.description || 'Pothole') + '</div>' +
+                '<div style="font-size:.7rem;color:#666;margin-bottom:7px">' + esc(c.district) + ', ' + esc(c.state) + '</div>' +
+                '<button onclick="selectC(\'' + esc(c.complaint_id) + '\')" style="width:100%;background:#0B3D91;color:#fff;border:none;border-radius:6px;padding:6px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">View & Update</button>' +
+                '</div>'
+            );
+            m.on('click', function() {
+                selectC(c.complaint_id);
+            });
+            mPins[c.complaint_id] = m;
+        }
+
+        function refreshPins() {
+            mLayer.clearLayers();
+            mPins = {};
+            filteredData.filter(function(c) {
+                if (mapMode === 'critical') return c.severity === 'CRITICAL';
+                if (mapMode === 'pending') return c.status !== 'RESOLVED';
+                return true;
+            }).forEach(addPin);
+        }
+
+        function setMapMode(m) {
+            mapMode = m;
+            ['all', 'crit', 'pend'].forEach(function(x) {
+                document.getElementById('mb-' + x).classList.remove('on');
+            });
+            document.getElementById('mb-' + m.replace('critical', 'crit').replace('pending', 'pend')).classList.add('on');
+            refreshPins();
+        }
+
+        // ── DATA ──────────────────────────────────────────────────
+        async function loadData() {
+            try {
+                var r = await authFetch('/api/complaints?limit=500');
+                allData = await r.json();
+                updateStats();
+                applyCurrentFilter();
+            } catch (e) {
+                showToast('Failed to load', 'err');
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('st-total').textContent = allData.length;
+            document.getElementById('st-critical').textContent = allData.filter(function(c) {
+                return c.severity === 'CRITICAL';
+            }).length;
+            document.getElementById('st-pending').textContent = allData.filter(function(c) {
+                return c.status === 'FILED';
+            }).length;
+            document.getElementById('st-resolved').textContent = allData.filter(function(c) {
+                return c.status === 'RESOLVED';
+            }).length;
+            document.getElementById('totalCount').textContent = allData.length;
+        }
+
+        function applyFilter(val, type) {
+            curFilter = val ? {
+                val: val,
+                type: type
+            } : {};
+            document.querySelectorAll('.fpill').forEach(function(p) {
+                p.classList.remove('on');
+            });
+            var id = !val ? 'fp-all' : val === 'FILED' ? 'fp-filed' : val === 'ACKNOWLEDGED' ? 'fp-ack' : val === 'IN_PROGRESS' ? 'fp-prog' : val === 'ESCALATED' ? 'fp-esc' : val === 'RESOLVED' ? 'fp-done' : 'fp-crit';
+            var el = document.getElementById(id);
+            if (el) el.classList.add('on');
+            applyCurrentFilter();
+        }
+
+        function doSearch() {
+            applyCurrentFilter();
+        }
+
+        function applyCurrentFilter() {
+            var q = (document.getElementById('searchInput').value || '').toLowerCase();
+            filteredData = allData.filter(function(c) {
+                if (curFilter.val) {
+                    var m = curFilter.type === 'severity' ? c.severity === curFilter.val : c.status === curFilter.val;
+                    if (!m) return false;
+                }
+                if (q) return (c.complaint_id || '').toLowerCase().includes(q) || (c.description || '').toLowerCase().includes(q) || (c.district || '').toLowerCase().includes(q) || (c.state || '').toLowerCase().includes(q) || (c.user_name || '').toLowerCase().includes(q);
+                return true;
+            });
+            renderList();
+            refreshPins();
+            document.getElementById('showCount').textContent = filteredData.length;
+        }
+
+        function renderList() {
+            var el = document.getElementById('compList');
+            if (!filteredData.length) {
+                el.innerHTML = '<div class="empty-list"><svg viewBox="0 0 24 24"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg><p>No complaints found</p></div>';
+                return;
+            }
+            var sorted = filteredData.slice().sort(function(a, b) {
+                var sa = a.severity === 'CRITICAL' ? 0 : a.severity === 'HIGH' ? 1 : a.severity === 'MEDIUM' ? 2 : 3;
+                var sb = b.severity === 'CRITICAL' ? 0 : b.severity === 'HIGH' ? 1 : b.severity === 'MEDIUM' ? 2 : 3;
+                return sa !== sb ? sa - sb : new Date(b.filed_at || 0) - new Date(a.filed_at || 0);
+            });
+            el.innerHTML = sorted.map(function(c) {
+                var col = SEV_COL[c.severity] || '#9ca3af';
+                var cls = STAT_CLS[c.status] || 'cb-filed';
+                var date = (c.filed_at || '').slice(0, 10);
+                var isNew = (new Date() - new Date(c.filed_at || 0)) < 86400000;
+                return '<div class="citem' + (curCid === c.complaint_id ? ' sel' : '') + '" onclick="selectC(\'' + esc(c.complaint_id) + '\')">' +
+                    '<div class="citem-sev" style="background:' + col + ';box-shadow:0 0 6px ' + col + '55"></div>' +
+                    '<div class="citem-body">' +
+                    '<div class="citem-id">' + esc(c.complaint_id) + '</div>' +
+                    '<div class="citem-desc">' + esc(c.description || 'Pothole reported') + '</div>' +
+                    '<div class="citem-loc">📍 ' + esc(c.district) + ', ' + esc(c.state) + (c.user_name ? ' · 👤 ' + esc(c.user_name) : '') + '</div>' +
+                    '<div class="citem-meta"><span class="cbadge ' + cls + '">' + c.status.replace('_', ' ') + '</span><span class="cbadge" style="background:' + col + '22;color:' + col + ';border:1px solid ' + col + '44">' + c.severity + '</span>' + (c.ai_detected ? '<span class="cbadge cb-ai">AI</span>' : '') + '</div>' +
+                    '</div>' +
+                    '<div class="citem-right"><div class="citem-date">' + date + '</div>' + (isNew && c.status === 'FILED' ? '<div class="citem-new"></div>' : '') + '</div>' +
+                    '</div>';
+            }).join('');
+        }
+
+        // ── SELECT & DETAIL ───────────────────────────────────────
+        async function selectC(cid) {
+            curCid = cid;
+            renderList();
+            if (mPins[cid]) {
+                map.flyTo(mPins[cid].getLatLng(), 14, {
+                    duration: 1
+                });
+                setTimeout(function() {
+                    mPins[cid].openPopup();
+                }, 1100);
+            }
+            document.getElementById('detailPanel').classList.add('open');
+            document.getElementById('detailInner').innerHTML = '<div class="spin"></div>';
+            try {
+                var r = await authFetch('/api/complaints/' + cid);
+                var c = await r.json();
+                renderDetail(c);
+            } catch (e) {
+                document.getElementById('detailInner').innerHTML = '<div style="color:#f87171;padding:16px">Failed to load.</div>';
+            }
+        }
+
+        function renderDetail(c) {
+            var col = SEV_COL[c.severity] || '#9ca3af';
+            var stats = ['ACKNOWLEDGED', 'IN_PROGRESS', 'RESOLVED', 'ESCALATED'];
+            var smap = {
+                ACKNOWLEDGED: {
+                    l: 'Acknowledge',
+                    cls: 'sbtn-ack',
+                    ic: '👁'
+                },
+                IN_PROGRESS: {
+                    l: 'In Progress',
+                    cls: 'sbtn-prog',
+                    ic: '⚙️'
+                },
+                RESOLVED: {
+                    l: 'Resolve',
+                    cls: 'sbtn-res',
+                    ic: '✅'
+                },
+                ESCALATED: {
+                    l: 'Escalate',
+                    cls: 'sbtn-esc',
+                    ic: '🚨'
+                }
+            };
+            var btns = stats.map(function(s) {
+                var sm = smap[s];
+                return '<button class="sbtn ' + sm.cls + (c.status === s ? ' act-s' : '') + '" onclick="updStatus(\'' + esc(c.complaint_id) + '\',\'' + s + '\')">' + sm.ic + ' ' + sm.l + '</button>';
+            }).join('');
+            document.getElementById('detailInner').innerHTML =
+                '<div class="d-header"><div><div class="d-id">' + esc(c.complaint_id) + '</div><div class="d-title">' + esc(c.description || 'Pothole') + '</div></div><button class="d-close" onclick="closeDetail()">✕</button></div>' +
+                '<div class="d-grid">' + dCell('Status', '<span style="color:' + (c.status === 'RESOLVED' ? '#4ade80' : c.status === 'ESCALATED' ? '#f87171' : '#fbbf24') + '">' + c.status.replace('_', ' ') + '</span>') + dCell('Severity', '<span style="color:' + col + '">' + c.severity + '</span>') + dCell('Location', esc(c.district) + ', ' + esc(c.state)) + dCell('Filed', (c.filed_at || '').slice(0, 10)) + dCell('Authority', esc(c.authority_name || '—')) + dCell('Helpline', esc(c.helpline || '—')) + dCell('Due', (c.response_deadline || '').slice(0, 10) || '—') + dCell('Filed By', esc(c.user_name || '—')) + '</div>' +
+                '<div class="d-lbl2">Update Status</div><div class="status-btns">' + btns + '</div>' +
+                '<div class="d-actions"><input class="note-input" id="noteInput" placeholder="Resolution note (optional)..." value="' + esc(c.resolution_note || '') + '"><button class="pdf-btn" onclick="dlPDF(\'' + esc(c.complaint_id) + '\')"><svg viewBox="0 0 24 24"><path d="M12 15V3M12 15l-4-4M12 15l4-4M3 19h18"/></svg>PDF</button></div>';
+        }
+
+        function dCell(l, v) {
+            return '<div class="d-cell"><div class="d-lbl">' + l + '</div><div class="d-val">' + v + '</div></div>';
+        }
+
+        function closeDetail() {
+            document.getElementById('detailPanel').classList.remove('open');
+            curCid = null;
+            renderList();
+        }
+        async function updStatus(cid, status) {
+            var note = (document.getElementById('noteInput') || {}).value || '';
+            showToast('Updating...', 'info');
+            try {
+                var r = await authFetch('/api/complaints/' + cid + '/status', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: status,
+                        note: note
+                    })
+                });
+                var d = await r.json();
+                if (r.ok) {
+                    showToast('✓ Updated to ' + status.replace('_', ' '), 'ok');
+                    var idx = allData.findIndex(function(x) {
+                        return x.complaint_id === cid;
+                    });
+                    if (idx >= 0) {
+                        allData[idx].status = status;
+                        if (note) allData[idx].resolution_note = note;
+                    }
+                    updateStats();
+                    applyCurrentFilter();
+                    var u = allData.find(function(x) {
+                        return x.complaint_id === cid;
+                    });
+                    if (u) renderDetail(u);
+                } else {
+                    showToast(d.error || 'Update failed', 'err');
+                }
+            } catch (e) {
+                showToast('Network error', 'err');
+            }
+        }
+
+        function dlPDF(cid) {
+            window.open('/api/complaints/' + cid + '/pdf?token=' + TOKEN, '_blank');
+        }
+
+        function exportCSV() {
+            var data = filteredData.length ? filteredData : allData;
+            var h = ['ID', 'Status', 'Severity', 'District', 'State', 'Description', 'Authority', 'Helpline', 'Filed', 'Deadline', 'AI', 'User'];
+            var rows = data.map(function(c) {
+                return [c.complaint_id, c.status, c.severity, c.district, c.state, (c.description || '').replace(/,/g, ' '), c.authority_name || '', c.helpline || '', (c.filed_at || '').slice(0, 10), (c.response_deadline || '').slice(0, 10), c.ai_detected ? 'Yes' : 'No', c.user_name || ''].join(',');
+            });
+            var blob = new Blob([
+                [h.join(',')].concat(rows).join('\n')
+            ], {
+                type: 'text/csv'
+            });
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'SADAK_' + new Date().toISOString().slice(0, 10) + '.csv';
+            a.click();
+            showToast('✓ Exported ' + data.length + ' records', 'ok');
+        }
+
+        // ── USERS ─────────────────────────────────────────────────
+        async function loadUsers() {
+            try {
+                var r = await authFetch('/api/admin/users');
+                if (!r.ok) {
+                    showToast('Failed to load users', 'err');
+                    return;
+                }
+                allUsers = await r.json();
+                renderUsers(allUsers);
+            } catch (e) {
+                showToast('Network error', 'err');
+            }
+        }
+
+        function filterUsers() {
+            var q = (document.getElementById('userSearch').value || '').toLowerCase();
+            renderUsers(!q ? allUsers : allUsers.filter(function(u) {
+                return (u.full_name || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q) || (u.district || '').toLowerCase().includes(q);
+            }));
+        }
+
+        function renderUsers(list) {
+            document.getElementById('u-total').textContent = allUsers.length;
+            document.getElementById('u-active').textContent = allUsers.filter(function(u) {
+                return u.is_active && u.role !== 'admin';
+            }).length;
+            document.getElementById('u-susp').textContent = allUsers.filter(function(u) {
+                return !u.is_active;
+            }).length;
+            document.getElementById('u-admins').textContent = allUsers.filter(function(u) {
+                return u.role === 'admin';
+            }).length;
+            var el = document.getElementById('userList');
+            if (!list.length) {
+                el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)"><div style="font-size:2rem;margin-bottom:10px">👤</div><p>No users found</p></div>';
+                return;
+            }
+            var myId = null;
+            try {
+                myId = JSON.parse(atob(TOKEN.split('.')[1])).sub;
+            } catch (e) {}
+            el.innerHTML = list.map(function(u) {
+                var isMe = u.id === myId,
+                    susp = !u.is_active,
+                    isAdm = u.role === 'admin';
+                var roleHtml = isAdm ? '<span class="u-role rb-admin">👑 Admin</span>' : susp ? '<span class="u-role rb-suspended">⛔ Suspended</span>' : '<span class="u-role rb-citizen">👤 Citizen</span>';
+                var acts = isMe ? '<span style="font-size:.7rem;color:var(--text2);padding:4px 0">← Your account</span>' :
+                    '<button class="ua ua-adm" onclick="toggleAdm(' + u.id + ',\'' + esc(u.full_name) + '\',\'' + u.role + '\')">' + (isAdm ? '↓ Remove Admin' : '👑 Make Admin') + '</button>' +
+                    (!isAdm ? '<button class="ua ' + (susp ? 'ua-act' : 'ua-sus') + '" onclick="toggleSusp(' + u.id + ',\'' + esc(u.full_name) + '\',' + susp + ')">' + (susp ? '✓ Reactivate' : '⛔ Suspend') + '</button>' : '') +
+                    (!isAdm ? '<button class="ua ua-del" onclick="openDel(' + u.id + ',\'' + esc(u.full_name) + '\',\'' + esc(u.email) + '\',' + u.total_complaints + ')">🗑 Delete</button>' : '');
+                return '<div class="u-card" id="uc-' + u.id + '">' +
+                    '<div class="u-card-main">' +
+                    '<div class="u-av" style="background:' + (u.avatar_color || '#0B3D91') + '">' + (u.full_name || '?')[0].toUpperCase() + '</div>' +
+                    '<div class="u-info">' +
+                    '<div class="u-name">' + esc(u.full_name) + (isMe ? ' <span style="color:var(--orange);font-size:.63rem">(You)</span>' : '') + '</div>' +
+                    '<div class="u-email">' + esc(u.email) + '</div>' +
+                    '<div class="u-meta"><span>📋 ' + u.total_complaints + ' complaints</span><span>📅 ' + ((u.created_at || '').slice(0, 10) || '—') + '</span><span>📍 ' + (u.district || '—') + '</span></div>' +
+                    '</div>' +
+                    roleHtml +
+                    '</div>' +
+                    '<div class="u-actions">' + acts + '</div>' +
+                    '</div>';
+            }).join('');
+        }
+
+        function openDel(uid, name, email, count) {
+            delTarget = {
+                uid: uid
+            };
+            document.getElementById('delName').textContent = name + ' (' + email + ')';
+            document.getElementById('delCount').textContent = count + ' complaint' + (count !== 1 ? 's' : '');
+            document.getElementById('delOverlay').classList.add('open');
+        }
+
+        function closeDelConfirm() {
+            document.getElementById('delOverlay').classList.remove('open');
+            delTarget = null;
+        }
+        async function confirmDelete() {
+            if (!delTarget) return;
+            var uid = delTarget.uid;
+            closeDelConfirm();
+            showToast('Deleting...', 'info');
+            try {
+                var r = await authFetch('/api/admin/users/' + uid + '/delete', {
+                    method: 'POST'
+                });
+                var d = await r.json();
+                if (d.success) {
+                    showToast('✓ ' + d.message, 'ok');
+                    allUsers = allUsers.filter(function(u) {
+                        return u.id !== uid;
+                    });
+                    renderUsers(allUsers);
+                    loadData();
+                } else showToast(d.error || 'Delete failed', 'err');
+            } catch (e) {
+                showToast('Network error', 'err');
+            }
+        }
+        async function toggleSusp(uid, name, isSusp) {
+            if (!confirm((isSusp ? 'Reactivate' : 'Suspend') + ' account of ' + name + '?')) return;
+            var r = await authFetch('/api/admin/users/' + uid + '/toggle', {
+                method: 'POST'
+            });
+            var d = await r.json();
+            if (d.success) {
+                showToast('✓ ' + d.message, 'ok');
+                var u = allUsers.find(function(x) {
+                    return x.id === uid;
+                });
+                if (u) u.is_active = d.active ? 1 : 0;
+                renderUsers(allUsers);
+            } else showToast(d.error || 'Failed', 'err');
+        }
+        async function toggleAdm(uid, name, role) {
+            if (!confirm((role === 'admin' ? 'Remove admin from ' : 'Make ') + name + ' admin?')) return;
+            var r = await authFetch('/api/admin/users/' + uid + '/make-admin', {
+                method: 'POST'
+            });
+            var d = await r.json();
+            if (d.success) {
+                showToast('✓ ' + d.message, 'ok');
+                var u = allUsers.find(function(x) {
+                    return x.id === uid;
+                });
+                if (u) u.role = d.new_role;
+                renderUsers(allUsers);
+            } else showToast(d.error || 'Failed', 'err');
+        }
+
+        // ── SSE ───────────────────────────────────────────────────
+        try {
+            var sse = new EventSource('/api/stream?token=' + TOKEN);
+            sse.onmessage = function(e) {
+                var m = JSON.parse(e.data);
+                if (m.type === 'new_complaint') {
+                    showToast('🆕 New complaint filed!', 'info');
+                    loadData();
+                } else if (m.type === 'complaint_updated') loadData();
+            };
+        } catch (e) {}
+
+        // ── TOAST ─────────────────────────────────────────────────
+        var _tt;
+
+        function showToast(msg, type) {
+            var t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast ' + (type || '');
+            clearTimeout(_tt);
+            setTimeout(function() {
+                t.classList.add('show');
+            }, 10);
+            _tt = setTimeout(function() {
+                t.classList.remove('show');
+            }, 3200);
+        }
+
+        // ── START ─────────────────────────────────────────────────
+        initPinGate();
+    </script>
+</body>
+
+</html>

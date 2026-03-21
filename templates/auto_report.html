@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+    <title>SADAK AI — File Complaint</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent
+        }
+        
+        :root {
+            --navy: #0B3D91;
+            --navy-light: #e8eef8;
+            --orange: #FF671F;
+            --green: #16a34a;
+            --green-light: #f0fdf4;
+            --red: #dc2626;
+            --red-light: #fef2f2;
+            --yellow: #ca8a04;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-400: #9ca3af;
+            --gray-600: #4b5563;
+            --gray-800: #1f2937;
+            --white: #fff;
+            --border: 1px solid #e5e7eb;
+            --radius: 8px;
+            --radius-lg: 12px;
+            --shadow: 0 1px 3px rgba(0, 0, 0, .06);
+        }
+        
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+            background: var(--gray-50)
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--gray-800);
+            display: flex;
+            flex-direction: column;
+            max-width: 430px;
+            margin: 0 auto
+        }
+        /* TOPBAR */
+        
+        .topbar {
+            background: var(--white);
+            border-bottom: var(--border);
+            padding: 12px 16px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+        
+        .back-btn {
+            width: 34px;
+            height: 34px;
+            background: var(--gray-100);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            border: none
+        }
+        
+        .back-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: none;
+            stroke: var(--gray-600);
+            stroke-width: 2.5;
+            stroke-linecap: round
+        }
+        
+        .topbar-title {
+            font-size: .92rem;
+            font-weight: 700
+        }
+        
+        .topbar-badge {
+            margin-left: auto;
+            font-size: .62rem;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 20px;
+            background: var(--navy-light);
+            color: var(--navy)
+        }
+        /* CONTENT */
+        
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch
+        }
+        
+        .content::-webkit-scrollbar {
+            display: none
+        }
+        /* PHOTO + AI BANNER */
+        
+        .ai-banner {
+            background: var(--white);
+            border-bottom: var(--border);
+            padding: 14px 16px;
+            display: flex;
+            gap: 12px;
+            align-items: center
+        }
+        
+        .photo-thumb {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--radius);
+            object-fit: cover;
+            border: var(--border);
+            flex-shrink: 0;
+            background: var(--gray-100)
+        }
+        
+        .ai-info {
+            flex: 1
+        }
+        
+        .ai-label {
+            font-size: .62rem;
+            font-weight: 600;
+            color: var(--navy);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 3px
+        }
+        
+        .ai-sev {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 4px
+        }
+        
+        .conf-row {
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+        
+        .conf-bar {
+            flex: 1;
+            height: 5px;
+            background: var(--gray-200);
+            border-radius: 3px;
+            overflow: hidden
+        }
+        
+        .conf-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 1s ease
+        }
+        
+        .conf-num {
+            font-size: .7rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            min-width: 30px;
+            text-align: right
+        }
+        /* MAP */
+        
+        .map-section {
+            margin: 12px 16px 0;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: var(--border);
+            box-shadow: var(--shadow)
+        }
+        
+        .map-header {
+            background: var(--white);
+            padding: 10px 14px;
+            border-bottom: var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+        
+        .map-header svg {
+            width: 14px;
+            height: 14px;
+            fill: none;
+            stroke: var(--navy);
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            flex-shrink: 0
+        }
+        
+        .map-title {
+            font-size: .78rem;
+            font-weight: 600;
+            color: var(--gray-800)
+        }
+        
+        .map-coords {
+            font-size: .65rem;
+            color: var(--gray-400);
+            font-family: monospace;
+            margin-left: auto
+        }
+        
+        #reportMap {
+            height: 180px;
+            width: 100%
+        }
+        
+        .gps-status {
+            background: var(--white);
+            padding: 10px 14px;
+            border-top: var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: .75rem
+        }
+        
+        .gps-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0
+        }
+        
+        .gps-dot.locking {
+            background: var(--yellow);
+            animation: blink 1s ease-in-out infinite
+        }
+        
+        .gps-dot.locked {
+            background: var(--green)
+        }
+        
+        .gps-dot.demo {
+            background: var(--gray-400)
+        }
+        
+        @keyframes blink {
+            0%,
+            100% {
+                opacity: 1
+            }
+            50% {
+                opacity: .3
+            }
+        }
+        
+        .gps-txt {
+            color: var(--gray-600)
+        }
+        
+        .auth-tag {
+            margin-left: auto;
+            font-size: .65rem;
+            font-weight: 600;
+            color: var(--navy);
+            background: var(--navy-light);
+            padding: 2px 8px;
+            border-radius: 10px
+        }
+        /* FORM CARDS */
+        
+        .card {
+            background: var(--white);
+            border: var(--border);
+            border-radius: var(--radius-lg);
+            margin: 12px 16px 0;
+            overflow: hidden;
+            box-shadow: var(--shadow)
+        }
+        
+        .card-hdr {
+            padding: 12px 14px;
+            border-bottom: var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+        
+        .card-hdr-num {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .65rem;
+            font-weight: 700;
+            flex-shrink: 0
+        }
+        
+        .num-done {
+            background: var(--green-light);
+            color: var(--green)
+        }
+        
+        .num-active {
+            background: var(--navy-light);
+            color: var(--navy)
+        }
+        
+        .num-wait {
+            background: var(--gray-100);
+            color: var(--gray-400)
+        }
+        
+        .card-hdr-title {
+            font-size: .82rem;
+            font-weight: 600;
+            flex: 1
+        }
+        
+        .card-hdr-tag {
+            font-size: .6rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 10px
+        }
+        
+        .tag-done {
+            background: var(--green-light);
+            color: var(--green)
+        }
+        
+        .tag-active {
+            background: var(--navy-light);
+            color: var(--navy)
+        }
+        
+        .tag-wait {
+            background: var(--gray-100);
+            color: var(--gray-400)
+        }
+        
+        .card-body {
+            padding: 14px
+        }
+        /* SEV GRID */
+        
+        .sev-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px
+        }
+        
+        .so {
+            padding: 9px 4px;
+            border-radius: var(--radius);
+            border: 1.5px solid var(--gray-200);
+            cursor: pointer;
+            text-align: center;
+            transition: all .15s
+        }
+        
+        .so-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin: 0 auto 4px
+        }
+        
+        .so-lbl {
+            font-size: .65rem;
+            font-weight: 600;
+            color: var(--gray-400)
+        }
+        
+        .so.active-C {
+            border-color: #dc2626;
+            background: #fef2f2
+        }
+        
+        .so.active-C .so-lbl {
+            color: #dc2626
+        }
+        
+        .so.active-C .so-dot {
+            background: #dc2626
+        }
+        
+        .so.active-H {
+            border-color: #ea580c;
+            background: #fff7ed
+        }
+        
+        .so.active-H .so-lbl {
+            color: #ea580c
+        }
+        
+        .so.active-H .so-dot {
+            background: #ea580c
+        }
+        
+        .so.active-M {
+            border-color: #ca8a04;
+            background: #fefce8
+        }
+        
+        .so.active-M .so-lbl {
+            color: #ca8a04
+        }
+        
+        .so.active-M .so-dot {
+            background: #ca8a04
+        }
+        
+        .so.active-L {
+            border-color: #16a34a;
+            background: #f0fdf4
+        }
+        
+        .so.active-L .so-lbl {
+            color: #16a34a
+        }
+        
+        .so.active-L .so-dot {
+            background: #16a34a
+        }
+        /* FORM */
+        
+        .fg {
+            margin-bottom: 12px
+        }
+        
+        .fg:last-child {
+            margin-bottom: 0
+        }
+        
+        .flbl {
+            display: block;
+            font-size: .72rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            margin-bottom: 5px
+        }
+        
+        .fi {
+            width: 100%;
+            border: var(--border);
+            border-radius: var(--radius);
+            padding: 9px 11px;
+            font-size: .85rem;
+            font-family: 'Inter', sans-serif;
+            color: var(--gray-800);
+            background: var(--white);
+            outline: none;
+            transition: border-color .2s
+        }
+        
+        .fi:focus {
+            border-color: var(--navy);
+            box-shadow: 0 0 0 2px var(--navy-light)
+        }
+        
+        .fi::placeholder {
+            color: var(--gray-400)
+        }
+        
+        textarea.fi {
+            resize: none;
+            height: 65px;
+            line-height: 1.5
+        }
+        
+        .row2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px
+        }
+        /* SUBMIT */
+        
+        .submit-footer {
+            flex-shrink: 0;
+            background: var(--white);
+            border-top: var(--border);
+            padding: 12px 16px calc(env(safe-area-inset-bottom)+12px)
+        }
+        
+        .err-alert {
+            display: none;
+            background: var(--red-light);
+            border-left: 3px solid var(--red);
+            border-radius: var(--radius);
+            padding: 9px 12px;
+            font-size: .78rem;
+            color: var(--red);
+            margin-bottom: 10px
+        }
+        
+        .err-alert.on {
+            display: block
+        }
+        
+        .submit-btn {
+            width: 100%;
+            background: var(--navy);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius);
+            padding: 13px;
+            font-family: 'Inter', sans-serif;
+            font-size: .9rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px
+        }
+        
+        .submit-btn:disabled {
+            background: var(--gray-400);
+            cursor: not-allowed
+        }
+        
+        .submit-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: none;
+            stroke: #fff;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+        /* PROCESSING */
+        
+        .proc-overlay {
+            display: none;
+            background: var(--white);
+            border-top: var(--border);
+            padding: 14px 16px
+        }
+        
+        .proc-overlay.on {
+            display: block
+        }
+        
+        .proc-step {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 5px 0;
+            font-size: .78rem;
+            color: var(--gray-400);
+            transition: color .3s
+        }
+        
+        .proc-step.done {
+            color: var(--green)
+        }
+        
+        .proc-step.active {
+            color: var(--navy)
+        }
+        
+        .proc-step-ic {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+        
+        .proc-step-ic svg {
+            width: 14px;
+            height: 14px;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke: currentColor
+        }
+        /* SUCCESS */
+        
+        .success-page {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 28px 20px;
+            text-align: center;
+            background: var(--white);
+            overflow-y: auto
+        }
+        
+        .success-page.show {
+            display: flex
+        }
+        
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--green-light);
+            border: 2px solid var(--green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px
+        }
+        
+        .success-icon svg {
+            width: 28px;
+            height: 28px;
+            fill: none;
+            stroke: var(--green);
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+        
+        .success-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 4px
+        }
+        
+        .success-sub {
+            font-size: .78rem;
+            color: var(--gray-400);
+            margin-bottom: 20px
+        }
+        
+        .info-card {
+            background: var(--gray-50);
+            border: var(--border);
+            border-radius: var(--radius-lg);
+            padding: 14px;
+            width: 100%;
+            text-align: left;
+            margin-bottom: 10px
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 5px 0;
+            border-bottom: var(--border);
+            font-size: .78rem;
+            gap: 8px
+        }
+        
+        .info-row:last-child {
+            border-bottom: none
+        }
+        
+        .info-lbl {
+            color: var(--gray-400);
+            font-size: .68rem;
+            font-weight: 500;
+            flex-shrink: 0
+        }
+        
+        .info-val {
+            color: var(--gray-800);
+            font-weight: 500;
+            text-align: right;
+            word-break: break-all
+        }
+        
+        .cid-val {
+            font-family: monospace;
+            color: var(--navy);
+            font-weight: 700;
+            font-size: .8rem
+        }
+        
+        .deadline-note {
+            background: #fffbeb;
+            border-left: 3px solid #ca8a04;
+            border-radius: var(--radius);
+            padding: 10px 12px;
+            width: 100%;
+            text-align: left;
+            font-size: .75rem;
+            color: #92400e;
+            margin-bottom: 16px
+        }
+        
+        .btn-primary {
+            width: 100%;
+            background: var(--navy);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius);
+            padding: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: .88rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px
+        }
+        
+        .btn-primary svg {
+            width: 14px;
+            height: 14px;
+            fill: none;
+            stroke: #fff;
+            stroke-width: 2.5;
+            stroke-linecap: round
+        }
+        
+        .btn-ghost {
+            width: 100%;
+            background: transparent;
+            border: var(--border);
+            border-radius: var(--radius);
+            padding: 11px;
+            font-family: 'Inter', sans-serif;
+            font-size: .84rem;
+            cursor: pointer;
+            color: var(--gray-600)
+        }
+        /* BOTTOM PADDING */
+        
+        .content-pad {
+            height: 20px
+        }
+        
+        .spin {
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, .3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin .6s linear infinite
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- TOPBAR -->
+    <div class="topbar" id="mainTopbar">
+        <button class="back-btn" onclick="window.location.href='/scanner'">
+    <svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+  </button>
+        <div class="topbar-title">File Complaint</div>
+        <div class="topbar-badge">AI DETECTED</div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="content" id="mainContent">
+
+        <!-- AI BANNER -->
+        <div class="ai-banner">
+            <img id="capturedPhoto" class="photo-thumb" alt="Captured pothole">
+            <div class="ai-info">
+                <div class="ai-label">AI Detection Result</div>
+                <div class="ai-sev" id="aiBannerSev">HIGH SEVERITY</div>
+                <div class="conf-row">
+                    <div class="conf-bar">
+                        <div class="conf-fill" id="confFill" style="width:0%"></div>
+                    </div>
+                    <div class="conf-num" id="confNum">0%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAP -->
+        <div class="map-section">
+            <div class="map-header">
+                <svg viewBox="0 0 24 24"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0112 2a8 8 0 018 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>
+                <div class="map-title">Pothole Location</div>
+                <div class="map-coords" id="mapCoords">Detecting GPS...</div>
+            </div>
+            <div id="reportMap"></div>
+            <div class="gps-status">
+                <div class="gps-dot locking" id="gpsDot"></div>
+                <div class="gps-txt" id="gpsStatusTxt">Acquiring GPS coordinates...</div>
+                <div class="auth-tag" id="authTag" style="display:none">Loading...</div>
+            </div>
+        </div>
+
+        <!-- SEVERITY -->
+        <div class="card">
+            <div class="card-hdr">
+                <div class="card-hdr-num num-done">&#10003;</div>
+                <div class="card-hdr-title">Severity Classification</div>
+                <div class="card-hdr-tag tag-done">AI CLASSIFIED</div>
+            </div>
+            <div class="card-body">
+                <div class="sev-grid">
+                    <div class="so" id="so-C" onclick="pickSev('CRITICAL',this)">
+                        <div class="so-dot" style="background:#dc2626"></div><span class="so-lbl">Critical</span></div>
+                    <div class="so" id="so-H" onclick="pickSev('HIGH',this)">
+                        <div class="so-dot" style="background:#ea580c"></div><span class="so-lbl">High</span></div>
+                    <div class="so" id="so-M" onclick="pickSev('MEDIUM',this)">
+                        <div class="so-dot" style="background:#ca8a04"></div><span class="so-lbl">Medium</span></div>
+                    <div class="so" id="so-L" onclick="pickSev('LOW',this)">
+                        <div class="so-dot" style="background:#16a34a"></div><span class="so-lbl">Low</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DETAILS -->
+        <div class="card">
+            <div class="card-hdr">
+                <div class="card-hdr-num num-wait">3</div>
+                <div class="card-hdr-title">Additional Details</div>
+                <div class="card-hdr-tag tag-wait">OPTIONAL</div>
+            </div>
+            <div class="card-body">
+                <div class="fg">
+                    <label class="flbl">Description / Landmark</label>
+                    <textarea class="fi" id="fDesc" placeholder="e.g. Near bus stop, school entrance, km marker..."></textarea>
+                </div>
+                <div class="row2">
+                    <div class="fg"><label class="flbl">Name</label><input class="fi" id="fName" placeholder="Your name"></div>
+                    <div class="fg"><label class="flbl">Mobile</label><input class="fi" id="fPhone" type="tel" placeholder="Mobile number"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-pad"></div>
+    </div>
+
+    <!-- PROCESSING OVERLAY -->
+    <div class="proc-overlay" id="procOverlay">
+        <div class="proc-step" id="ps1">
+            <div class="proc-step-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>Verifying AI detection result...</div>
+        <div class="proc-step" id="ps2">
+            <div class="proc-step-ic"><svg viewBox="0 0 24 24"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0112 2a8 8 0 018 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg></div>Confirming GPS coordinates...</div>
+        <div class="proc-step" id="ps3">
+            <div class="proc-step-ic"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/></svg></div>Routing to correct authority...</div>
+        <div class="proc-step" id="ps4">
+            <div class="proc-step-ic"><svg viewBox="0 0 24 24"><path d="M9 12h6M9 16h6M9 8h6M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg></div>Filing official complaint...</div>
+    </div>
+
+    <!-- SUBMIT FOOTER -->
+    <div class="submit-footer" id="submitFooter">
+        <div class="err-alert" id="errAlert"></div>
+        <button class="submit-btn" id="submitBtn" onclick="submitReport()">
+    <svg viewBox="0 0 24 24"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0112 2a8 8 0 018 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>
+    <span id="submitTxt">File Official Complaint</span>
+    <div class="spin" id="submitSpin" style="display:none"></div>
+  </button>
+    </div>
+
+    <!-- SUCCESS PAGE -->
+    <div class="success-page" id="successPage">
+        <div class="success-icon">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="success-title">Complaint Filed</div>
+        <div class="success-sub" id="sucSub">Your complaint has been registered successfully</div>
+        <div class="info-card">
+            <div class="info-row"><span class="info-lbl">Complaint ID</span><span class="info-val cid-val" id="sucCid">---</span></div>
+            <div class="info-row"><span class="info-lbl">Location</span><span class="info-val" id="sucLoc">---</span></div>
+            <div class="info-row"><span class="info-lbl">Authority</span><span class="info-val" id="sucAuth">---</span></div>
+            <div class="info-row"><span class="info-lbl">Helpline</span><span class="info-val" id="sucPhone" style="color:var(--navy);font-weight:700">---</span></div>
+            <div class="info-row"><span class="info-lbl">AI Confidence</span><span class="info-val" id="sucAI">---</span></div>
+        </div>
+        <div class="deadline-note" id="sucDeadline">Response expected within ---</div>
+        <button class="btn-primary" onclick="shareComplaint()">
+    <svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
+    Share Complaint
+  </button>
+        <button class="btn-ghost" onclick="window.location.href='/home'">Back to Home</button>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        var token = localStorage.getItem('sadak_token');
+        if (!token) {
+            window.location.href = '/';
+        }
+
+        var SEV_COLORS = {
+            CRITICAL: '#dc2626',
+            HIGH: '#ea580c',
+            MEDIUM: '#ca8a04',
+            LOW: '#16a34a'
+        };
+        var SEV_LABELS = {
+            CRITICAL: 'Critical Severity',
+            HIGH: 'High Severity',
+            MEDIUM: 'Medium Severity',
+            LOW: 'Low Severity'
+        };
+        var ETA = {
+            CRITICAL: '24 hours',
+            HIGH: '72 hours',
+            MEDIUM: '7 days',
+            LOW: '30 days'
+        };
+
+        var selSev = sessionStorage.getItem('detected_severity') || 'MEDIUM';
+        var capturedB64 = sessionStorage.getItem('captured_image_b64') || '';
+        var gpsLat = null;
+        var gpsLng = null;
+        var leafMap = null;
+        var mapMarker = null;
+        var lastComplaint = null;
+
+        function authFetch(url, opts) {
+            var sep = url.indexOf('?') >= 0 ? '&' : '?';
+            if (!opts) opts = {};
+            if (!opts.headers) opts.headers = {};
+            opts.headers['Authorization'] = 'Bearer ' + token;
+            return fetch(url + sep + 'token=' + token, opts);
+        }
+
+        function esc(s) {
+            return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        // Init map
+        function initMap(lat, lng) {
+            if (leafMap) {
+                leafMap.remove();
+                leafMap = null;
+            }
+            leafMap = L.map('reportMap', {
+                zoomControl: false,
+                attributionControl: false
+            }).setView([lat, lng], 17);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19
+            }).addTo(leafMap);
+            var icon = L.divIcon({
+                html: '<div style="width:20px;height:20px;background:#dc2626;border:3px solid #fff;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.3)"></div>',
+                iconSize: [20, 20],
+                iconAnchor: [10, 10],
+                className: ''
+            });
+            mapMarker = L.marker([lat, lng], {
+                icon: icon
+            }).addTo(leafMap);
+            L.circle([lat, lng], {
+                radius: 15,
+                color: '#dc2626',
+                fillColor: '#dc2626',
+                fillOpacity: .1,
+                weight: 1
+            }).addTo(leafMap);
+        }
+
+        // Load banner
+        function loadBanner() {
+            var conf = parseFloat(sessionStorage.getItem('detected_confidence') || '0.7');
+            var col = SEV_COLORS[selSev] || '#ea580c';
+            document.getElementById('aiBannerSev').textContent = SEV_LABELS[selSev] || selSev;
+            document.getElementById('aiBannerSev').style.color = col;
+            document.getElementById('confFill').style.width = Math.round(conf * 100) + '%';
+            document.getElementById('confFill').style.background = col;
+            document.getElementById('confNum').textContent = Math.round(conf * 100) + '%';
+            if (capturedB64) document.getElementById('capturedPhoto').src = capturedB64;
+            var map2 = {
+                CRITICAL: 'C',
+                HIGH: 'H',
+                MEDIUM: 'M',
+                LOW: 'L'
+            };
+            var k = map2[selSev];
+            if (k) pickSev(selSev, document.getElementById('so-' + k));
+        }
+
+        function pickSev(sev, el) {
+            selSev = sev;
+            document.querySelectorAll('.so').forEach(function(s) {
+                s.className = 'so';
+            });
+            var map2 = {
+                CRITICAL: 'active-C',
+                HIGH: 'active-H',
+                MEDIUM: 'active-M',
+                LOW: 'active-L'
+            };
+            if (el && map2[sev]) el.classList.add(map2[sev]);
+        }
+
+        // GPS
+        function detectGPS() {
+            if (!navigator.geolocation) {
+                useDemoGPS();
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(
+                function(pos) {
+                    setGPS(pos.coords.latitude, pos.coords.longitude, false);
+                },
+                function() {
+                    useDemoGPS();
+                }, {
+                    enableHighAccuracy: true,
+                    timeout: 14000,
+                    maximumAge: 0
+                }
+            );
+        }
+
+        function useDemoGPS() {
+            setGPS(12.9716, 77.5946, true);
+        }
+
+        function setGPS(lat, lng, demo) {
+            gpsLat = lat;
+            gpsLng = lng;
+            document.getElementById('mapCoords').textContent = lat.toFixed(5) + ', ' + lng.toFixed(5);
+            document.getElementById('gpsDot').className = 'gps-dot ' + (demo ? 'demo' : 'locked');
+            document.getElementById('gpsStatusTxt').textContent = demo ?
+                'Demo location — enable GPS for accuracy' :
+                'GPS locked — accurate to ±5m';
+
+            setTimeout(function() {
+                initMap(lat, lng);
+            }, 100);
+
+            authFetch('/api/geocode?lat=' + lat + '&lng=' + lng)
+                .then(function(r) {
+                    return r.json();
+                })
+                .then(function(a) {
+                    document.getElementById('authTag').textContent = a.authority_name || '---';
+                    document.getElementById('authTag').style.display = 'block';
+                })
+                .catch(function() {});
+        }
+
+        // Submit
+        function submitReport() {
+            if (!gpsLat || !gpsLng) {
+                showErr('GPS not ready. Please wait.');
+                return;
+            }
+
+            document.getElementById('errAlert').classList.remove('on');
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('submitTxt').style.display = 'none';
+            document.getElementById('submitSpin').style.display = 'block';
+            document.getElementById('procOverlay').classList.add('on');
+
+            var steps = ['ps1', 'ps2', 'ps3', 'ps4'];
+            var si = 0;
+            var timer = setInterval(function() {
+                if (si > 0) {
+                    document.getElementById(steps[si - 1]).classList.remove('active');
+                    document.getElementById(steps[si - 1]).classList.add('done');
+                }
+                if (si < steps.length) {
+                    document.getElementById(steps[si]).classList.add('active');
+                    si++;
+                } else clearInterval(timer);
+            }, 600);
+
+            var fd = new FormData();
+            fd.append('latitude', gpsLat);
+            fd.append('longitude', gpsLng);
+            fd.append('severity', selSev);
+            fd.append('description', document.getElementById('fDesc').value.trim());
+            fd.append('reporter_name', document.getElementById('fName').value.trim());
+            fd.append('reporter_phone', document.getElementById('fPhone').value.trim());
+
+            function doPost() {
+                authFetch('/api/report/pothole', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: fd
+                    })
+                    .then(function(r) {
+                        clearInterval(timer);
+                        steps.forEach(function(id) {
+                            document.getElementById(id).classList.add('done');
+                            document.getElementById(id).classList.remove('active');
+                        });
+                        return r.json().then(function(d) {
+                            return {
+                                ok: r.ok,
+                                data: d
+                            };
+                        });
+                    })
+                    .then(function(res) {
+                        if (!res.ok) {
+                            showErr(res.data.error || 'Submission failed');
+                            resetBtn();
+                            return;
+                        }
+                        lastComplaint = res.data.complaint;
+                        setTimeout(function() {
+                            showSuccess(res.data.complaint, res.data.ai_result);
+                        }, 500);
+                    })
+                    .catch(function(e) {
+                        clearInterval(timer);
+                        showErr('Network error: ' + e.message);
+                        resetBtn();
+                    });
+            }
+
+            if (capturedB64 && capturedB64.indexOf('data:') === 0) {
+                fetch(capturedB64).then(function(r) {
+                        return r.blob();
+                    })
+                    .then(function(b) {
+                        fd.append('image', b, 'pothole.jpg');
+                        doPost();
+                    })
+                    .catch(function() {
+                        doPost();
+                    });
+            } else {
+                doPost();
+            }
+        }
+
+        function showSuccess(c, ai) {
+            document.getElementById('mainTopbar').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('submitFooter').style.display = 'none';
+            document.getElementById('procOverlay').style.display = 'none';
+
+            document.getElementById('sucCid').textContent = c.complaint_id || '---';
+            document.getElementById('sucLoc').textContent = (c.district || '---') + ', ' + (c.state || '---');
+            document.getElementById('sucAuth').textContent = c.authority_name || '---';
+            document.getElementById('sucPhone').textContent = c.helpline || '---';
+            document.getElementById('sucAI').textContent = ai && ai.detected ?
+                Math.round((ai.confidence || 0) * 100) + '% confidence, ' + (ai.pothole_count || 1) + ' pothole(s)' :
+                'Manual report';
+            document.getElementById('sucDeadline').textContent =
+                'Expected response within ' + (ETA[c.severity] || '---') + '. Overdue complaints auto-escalate to District Collector.';
+
+            document.getElementById('successPage').classList.add('show');
+            if (navigator.vibrate) navigator.vibrate([80, 40, 80, 40, 200]);
+        }
+
+        function showErr(msg) {
+            var el = document.getElementById('errAlert');
+            el.textContent = msg;
+            el.classList.add('on');
+        }
+
+        function resetBtn() {
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('submitTxt').style.display = '';
+            document.getElementById('submitSpin').style.display = 'none';
+            document.getElementById('procOverlay').classList.remove('on');
+        }
+
+        function shareComplaint() {
+            if (!lastComplaint) return;
+            var txt = 'SADAK AI — Road Damage Report\n' +
+                'Complaint: ' + lastComplaint.complaint_id + '\n' +
+                'Severity: ' + lastComplaint.severity + '\n' +
+                'Location: ' + lastComplaint.district + ', ' + lastComplaint.state + '\n' +
+                'Authority: ' + lastComplaint.authority_name + '\n' +
+                'Helpline: ' + lastComplaint.helpline;
+            if (navigator.share) navigator.share({
+                title: 'SADAK AI',
+                text: txt
+            });
+            else if (navigator.clipboard) navigator.clipboard.writeText(txt);
+        }
+
+        // Pre-fill user
+        try {
+            var u = JSON.parse(localStorage.getItem('sadak_user') || '{}');
+            if (u.full_name) document.getElementById('fName').value = u.full_name;
+            if (u.phone) document.getElementById('fPhone').value = u.phone;
+        } catch (e) {}
+
+        loadBanner();
+        detectGPS();
+    </script>
+</body>
+
+</html>

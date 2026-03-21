@@ -1,0 +1,2829 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <title>SADAK AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent
+        }
+        
+        html,
+        body {
+            height: 100%;
+            background: #010e2e;
+            font-family: 'Inter', sans-serif
+        }
+        /* ════ SPLASH ════ */
+        
+        #splash {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: linear-gradient(160deg, #010e2e 0%, #042060 40%, #0B3D91 75%, #0d47a1 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.6s ease;
+        }
+        
+        .sp-logo-wrap {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 22px
+        }
+        
+        .sp-ring1 {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 103, 31, .4);
+            animation: spR 2s ease-in-out infinite
+        }
+        
+        .sp-ring2 {
+            position: absolute;
+            inset: -14px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255, 103, 31, .15);
+            animation: spR 2s ease-in-out infinite 0.7s
+        }
+        
+        @keyframes spR {
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: .7
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: .1
+            }
+        }
+        
+        .sp-name {
+            font-size: 2.5rem;
+            font-weight: 900;
+            letter-spacing: 4px;
+            line-height: 1;
+            margin-bottom: 5px
+        }
+        
+        .sp-name .s {
+            color: #FF671F
+        }
+        
+        .sp-name .a {
+            color: #fff
+        }
+        
+        .sp-sub {
+            font-size: .59rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, .35);
+            margin-bottom: 26px
+        }
+        
+        .sp-gov {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            background: rgba(255, 255, 255, .07);
+            border: 1px solid rgba(255, 255, 255, .12);
+            border-radius: 20px;
+            padding: 6px 16px;
+            margin-bottom: 36px
+        }
+        
+        .sp-flag {
+            display: flex;
+            gap: 2px
+        }
+        
+        .sp-flag i {
+            display: block;
+            width: 11px;
+            height: 3px;
+            border-radius: 1px;
+            font-style: normal
+        }
+        
+        .sp-gov-txt {
+            color: rgba(255, 255, 255, .5);
+            font-size: .6rem
+        }
+        
+        .sp-progress {
+            width: 160px
+        }
+        
+        .sp-track {
+            height: 2px;
+            background: rgba(255, 255, 255, .1);
+            border-radius: 1px;
+            overflow: hidden;
+            margin-bottom: 8px
+        }
+        
+        .sp-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #FF671F, #ff8c00);
+            border-radius: 1px;
+            transition: width 0.1s linear
+        }
+        
+        .sp-lbl {
+            color: rgba(255, 255, 255, .3);
+            font-size: .58px;
+            text-align: center;
+            min-height: 14px;
+            font-size: .58rem
+        }
+        /* ════ PAGE ════ */
+        
+        .pg-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: linear-gradient(160deg, #010e2e 0%, #042060 30%, #0B3D91 65%, #0d47a1 100%);
+        }
+        
+        .pg-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(255, 255, 255, .015) 59px, rgba(255, 255, 255, .015) 60px), repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(255, 255, 255, .015) 59px, rgba(255, 255, 255, .015) 60px);
+        }
+        
+        .pg-bg::after {
+            content: '';
+            position: absolute;
+            bottom: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 480px;
+            height: 240px;
+            border-radius: 50%;
+            background: radial-gradient(ellipse, rgba(255, 103, 31, .1), transparent 70%);
+        }
+        
+        .page {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 0;
+            min-height: 100%;
+        }
+        
+        .page::-webkit-scrollbar {
+            display: none
+        }
+        /* GOV BAR */
+        
+        .govbar {
+            width: 100%;
+            background: rgba(1, 14, 46, .8);
+            backdrop-filter: blur(16px);
+            padding: 7px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, .07);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            flex-shrink: 0;
+        }
+        
+        .gov-em {
+            width: 22px;
+            height: 22px;
+            background: #fff;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: 10px;
+            color: #0B3D91;
+            font-weight: 900;
+            flex-shrink: 0
+        }
+        
+        .gov-t {
+            flex: 1
+        }
+        
+        .gov-t b {
+            display: block;
+            color: #fff;
+            font-size: .62rem;
+            font-weight: 700;
+            line-height: 1.3
+        }
+        
+        .gov-t span {
+            color: rgba(255, 255, 255, .42);
+            font-size: .54rem
+        }
+        
+        .gov-tc {
+            display: flex;
+            gap: 2px;
+            flex-shrink: 0
+        }
+        
+        .gov-tc div {
+            width: 13px;
+            height: 3px;
+            border-radius: 1px
+        }
+        /* HERO */
+        
+        .hero {
+            padding: 24px 20px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            z-index: 1
+        }
+        
+        .hero-logo {
+            width: 66px;
+            height: 66px;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 4px 18px rgba(255, 103, 31, .3))
+        }
+        
+        .hero-name {
+            font-size: 1.85rem;
+            font-weight: 900;
+            letter-spacing: 3.5px;
+            line-height: 1;
+            margin-bottom: 4px
+        }
+        
+        .hero-name .s {
+            color: #FF671F
+        }
+        
+        .hero-name .a {
+            color: #fff
+        }
+        
+        .hero-sub {
+            font-size: .59rem;
+            letter-spacing: 4.5px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, .32)
+        }
+        /* CARD */
+        
+        .card {
+            width: calc(100% - 28px);
+            max-width: 400px;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, .28), 0 0 0 1px rgba(255, 255, 255, .1);
+            z-index: 1;
+            margin-top: 16px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #f0f0f0
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 14px;
+            font-family: 'Inter', sans-serif;
+            font-size: .83rem;
+            font-weight: 500;
+            color: #aaa;
+            border: none;
+            background: none;
+            border-bottom: 2.5px solid transparent;
+            cursor: pointer;
+            transition: color .25s ease, background .2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tab:active {
+            background: rgba(11, 61, 145, .04)
+        }
+        
+        .tab.on {
+            color: #0B3D91;
+            border-bottom-color: #0B3D91;
+            font-weight: 700
+        }
+        
+        .fb {
+            padding: 20px 20px 18px
+        }
+        
+        .scr {
+            display: none
+        }
+        
+        .scr.on {
+            display: block
+        }
+        /* INPUTS */
+        
+        .fg {
+            margin-bottom: 13px
+        }
+        
+        .lbl {
+            display: block;
+            font-size: .71rem;
+            font-weight: 600;
+            color: #5a6272;
+            margin-bottom: 5px
+        }
+        
+        .opt {
+            font-weight: 400;
+            color: #aaa;
+            font-size: .65rem
+        }
+        
+        .fi {
+            width: 100%;
+            border: 1.5px solid #e8eaed;
+            border-radius: 9px;
+            padding: 11px 13px;
+            font-size: .87rem;
+            font-family: 'Inter', sans-serif;
+            color: #111827;
+            background: #fafbfc;
+            outline: none;
+            transition: border-color .15s, box-shadow .15s, background .15s;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        .fi:focus {
+            border-color: #0B3D91;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(11, 61, 145, .08)
+        }
+        
+        .fi::placeholder {
+            color: #bfc3cc
+        }
+        
+        .fi:disabled {
+            background: #f4f5f7;
+            color: #aaa;
+            cursor: not-allowed
+        }
+        
+        .fi-sel {
+            background: #fafbfc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 13px center;
+            padding-right: 34px;
+            cursor: pointer;
+        }
+        
+        .r2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px
+        }
+        
+        .otp-row {
+            display: flex;
+            gap: 8px
+        }
+        
+        .otp-row .fi {
+            flex: 1
+        }
+        
+        .send-btn {
+            flex-shrink: 0;
+            min-width: 96px;
+            padding: 11px 14px;
+            background: #0B3D91;
+            color: #fff;
+            border: none;
+            border-radius: 9px;
+            font-size: .76rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .send-btn:disabled {
+            background: #bbb;
+            cursor: not-allowed
+        }
+        
+        .note {
+            font-size: .67rem;
+            margin-top: 4px;
+            color: #9ca3af;
+            line-height: 1.4
+        }
+        
+        .note.ok {
+            color: #16a34a;
+            font-weight: 500
+        }
+        
+        .otp-f {
+            display: none;
+            margin-top: 11px
+        }
+        
+        .otp-f.show {
+            display: block
+        }
+        
+        .otp-big {
+            letter-spacing: 14px;
+            font-size: 1.25rem;
+            font-weight: 800;
+            text-align: center;
+            font-family: 'Courier New', monospace
+        }
+        /* GPS */
+        
+        .loc-card {
+            background: linear-gradient(135deg, #eff6ff, #e8f0fe);
+            border: 1.5px solid #c7d9f8;
+            border-radius: 12px;
+            padding: 13px;
+            margin-bottom: 13px
+        }
+        
+        .loc-top {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+        
+        .loc-ic {
+            width: 38px;
+            height: 38px;
+            background: #0B3D91;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0
+        }
+        
+        .loc-ic svg {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: #fff;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+        
+        .loc-title {
+            font-size: .84rem;
+            font-weight: 700;
+            color: #0B3D91
+        }
+        
+        .loc-sub {
+            font-size: .65rem;
+            color: #4b75e4;
+            margin-top: 1px
+        }
+        
+        .gps-btn {
+            margin-left: auto;
+            flex-shrink: 0;
+            padding: 8px 13px;
+            background: #0B3D91;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: .74rem;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap
+        }
+        
+        .gps-btn:disabled {
+            background: #bbb;
+            cursor: not-allowed
+        }
+        
+        .gps-btn.done {
+            background: #16a34a
+        }
+        
+        .loc-res {
+            display: none;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-top: 10px
+        }
+        
+        .loc-res.show {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px
+        }
+        
+        .loc-ok {
+            color: #16a34a;
+            flex-shrink: 0;
+            font-size: 1rem;
+            margin-top: 1px
+        }
+        
+        .loc-place {
+            font-size: .8rem;
+            font-weight: 600;
+            color: #111
+        }
+        
+        .loc-coord {
+            font-size: .63rem;
+            color: #aaa;
+            margin-top: 2px
+        }
+        
+        .loc-edit {
+            margin-left: auto;
+            flex-shrink: 0;
+            padding: 3px 9px;
+            background: #dbeafe;
+            color: #0B3D91;
+            border: none;
+            border-radius: 6px;
+            font-size: .67rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif
+        }
+        
+        .manual {
+            display: none;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e9eaec
+        }
+        
+        .manual.show {
+            display: block
+        }
+        
+        .manual-h {
+            font-size: .68rem;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            margin-bottom: 10px
+        }
+        /* PW */
+        
+        .pw-r {
+            position: relative
+        }
+        
+        .pw-eye {
+            position: absolute;
+            right: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #bbb;
+            padding: 4px
+        }
+        
+        .pw-eye svg {
+            width: 15px;
+            height: 15px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            display: block
+        }
+        
+        .pw-bars {
+            display: flex;
+            gap: 3px;
+            margin-top: 6px
+        }
+        
+        .pw-bar {
+            height: 3px;
+            flex: 1;
+            border-radius: 2px;
+            background: #ebebeb;
+            transition: background .3s
+        }
+        /* ALERTS */
+        
+        .al {
+            display: none;
+            padding: 10px 13px;
+            border-radius: 9px;
+            font-size: .78rem;
+            margin-bottom: 13px;
+            border-left: 3.5px solid;
+            align-items: flex-start;
+            gap: 8px;
+            line-height: 1.4
+        }
+        
+        .al.show {
+            display: flex
+        }
+        
+        .al svg {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+            margin-top: 1px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+        
+        .al.err {
+            background: #fef2f2;
+            border-color: #dc2626;
+            color: #b91c1c
+        }
+        
+        .al.ok {
+            background: #f0fdf4;
+            border-color: #16a34a;
+            color: #15803d
+        }
+        
+        .al.warn {
+            background: #fffbeb;
+            border-color: #f59e0b;
+            color: #92400e
+        }
+        /* BTNS */
+        
+        .btn {
+            width: 100%;
+            border: none;
+            border-radius: 10px;
+            padding: 13px;
+            font-family: 'Inter', sans-serif;
+            font-size: .9rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all .15s;
+            margin-top: 6px
+        }
+        
+        .btn-nv {
+            background: #0B3D91;
+            color: #fff
+        }
+        
+        .btn-nv:hover {
+            background: #08296e
+        }
+        
+        .btn-nv:disabled {
+            background: #bbb;
+            cursor: not-allowed;
+            opacity: .75
+        }
+        
+        .btn-out {
+            background: none;
+            border: 1.5px solid #e5e7eb;
+            color: #0B3D91;
+            margin-top: 8px
+        }
+        
+        .btn-out:hover {
+            background: #f9fafb
+        }
+        
+        .div {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 14px 0;
+            color: #ccc;
+            font-size: .7rem
+        }
+        
+        .div::before,
+        .div::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #ededed
+        }
+        
+        .spin {
+            width: 15px;
+            height: 15px;
+            border: 2px solid rgba(255, 255, 255, .25);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin .65s linear infinite
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+        /* HINT */
+        
+        .hint {
+            background: #eff6ff;
+            border-left: 3px solid #3b82f6;
+            border-radius: 0 9px 9px 0;
+            padding: 10px 12px;
+            font-size: .76rem;
+            color: #1e40af;
+            margin-bottom: 16px;
+            line-height: 1.5
+        }
+        /* FORGOT LINK */
+        
+        .fp-row {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center
+        }
+        
+        .fp-row button {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f0f4ff;
+            border: 1.5px solid #c7d9f8;
+            border-radius: 8px;
+            padding: 8px 16px;
+            cursor: pointer;
+            color: #0B3D91;
+            font-size: .78rem;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .fp-row button:hover {
+            background: #dbeafe
+        }
+        /* TERMS GATE */
+        
+        .terms-gate {
+            background: #fff
+        }
+        
+        .terms-gate-header {
+            text-align: center;
+            margin-bottom: 16px;
+            padding: 4px 0
+        }
+        
+        .terms-gate-icon {
+            width: 52px;
+            height: 52px;
+            background: #eff6ff;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            margin: 0 auto 10px
+        }
+        
+        .terms-gate-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: none;
+            stroke: #0B3D91;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+        
+        .terms-gate-title {
+            font-size: .92rem;
+            font-weight: 800;
+            color: #111;
+            margin-bottom: 4px
+        }
+        
+        .terms-gate-sub {
+            font-size: .74rem;
+            color: #6b7280;
+            line-height: 1.5
+        }
+        
+        .terms-chk-wrap {
+            background: #f8faff;
+            border: 1.5px solid #c7d9f8;
+            border-radius: 10px;
+            padding: 12px 13px;
+            margin-bottom: 8px;
+            transition: all .3s;
+        }
+        
+        .terms-chk-wrap.ok {
+            background: #f0fdf4;
+            border-color: #86efac
+        }
+        
+        .terms-chk-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            cursor: pointer
+        }
+        
+        .terms-chk-label input {
+            width: 18px;
+            height: 18px;
+            accent-color: #0B3D91;
+            cursor: pointer;
+            margin: 0;
+            flex-shrink: 0;
+            margin-top: 1px
+        }
+        
+        .terms-chk-label span {
+            font-size: .74rem;
+            color: #374151;
+            line-height: 1.55
+        }
+        
+        .terms-chk-label button {
+            background: none;
+            border: none;
+            color: #0B3D91;
+            font-weight: 700;
+            font-size: .74rem;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            padding: 0;
+            text-decoration: underline
+        }
+        
+        .terms-btns {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            margin-bottom: 0
+        }
+        
+        .terms-btns .btn {
+            margin-top: 0;
+            flex: 1
+        }
+        /* STEP INDICATOR */
+        
+        .steps {
+            display: flex;
+            align-items: center;
+            margin-bottom: 18px
+        }
+        
+        .step-dot {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: .72rem;
+            font-weight: 800;
+            border: 2px solid #e5e7eb;
+            color: #aaa;
+            background: #f9fafb;
+            transition: all .3s;
+            flex-shrink: 0
+        }
+        
+        .step-dot.act {
+            background: #0B3D91;
+            border-color: #0B3D91;
+            color: #fff;
+            box-shadow: 0 0 0 4px rgba(11, 61, 145, .1)
+        }
+        
+        .step-dot.done {
+            background: #16a34a;
+            border-color: #16a34a;
+            color: #fff
+        }
+        
+        .step-lbl {
+            display: block;
+            font-size: .56rem;
+            color: #aaa;
+            font-weight: 500;
+            text-align: center;
+            margin-top: 3px
+        }
+        
+        .step-line {
+            flex: 1;
+            height: 2px;
+            background: #e5e7eb;
+            margin: 0 4px 18px;
+            border-radius: 1px;
+            transition: background .3s
+        }
+        
+        .step-line.done {
+            background: #16a34a
+        }
+        
+        .ibox {
+            border-radius: 9px;
+            padding: 11px 13px;
+            font-size: .76rem;
+            margin-bottom: 14px;
+            line-height: 1.5
+        }
+        
+        .ibox.blue {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af
+        }
+        
+        .ibox.green {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534
+        }
+        
+        .ibox em {
+            font-weight: 700;
+            font-style: normal
+        }
+        /* CARD FOOT */
+        
+        .card-foot {
+            padding: 12px 20px 14px;
+            background: linear-gradient(to bottom, #fafafa, #f4f5f6);
+            border-top: 1px solid #f0f0f0;
+            text-align: center;
+            border-radius: 0 0 20px 20px
+        }
+        
+        .card-foot p {
+            font-size: .62rem;
+            color: #b0b4bb;
+            line-height: 1.8
+        }
+        
+        .card-foot a {
+            color: #0B3D91;
+            text-decoration: none;
+            font-weight: 500
+        }
+        /* MODAL */
+        
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9000;
+            background: rgba(0, 0, 0, .6);
+            backdrop-filter: blur(4px);
+            align-items: flex-end;
+            justify-content: center
+        }
+        
+        .modal.open {
+            display: flex
+        }
+        
+        .m-sheet {
+            background: #fff;
+            border-radius: 20px 20px 0 0;
+            width: 100%;
+            max-width: 430px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 -8px 40px rgba(0, 0, 0, .2)
+        }
+        
+        .m-head {
+            background: #0B3D91;
+            padding: 15px 18px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0
+        }
+        
+        .m-head-ic {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, .14);
+            border-radius: 8px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0
+        }
+        
+        .m-head-ic svg {
+            width: 16px;
+            height: 16px;
+            fill: none;
+            stroke: #fff;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+        
+        .m-head-title {
+            color: #fff;
+            font-size: .88rem;
+            font-weight: 800;
+            flex: 1
+        }
+        
+        .m-head-sub {
+            color: rgba(255, 255, 255, .48);
+            font-size: .59rem;
+            margin-top: 1px
+        }
+        
+        .m-x {
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, .14);
+            border: none;
+            color: #fff;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: .9rem;
+            display: grid;
+            place-items: center
+        }
+        
+        .m-body {
+            overflow-y: auto;
+            padding: 18px 20px;
+            flex: 1;
+            font-size: .77rem;
+            color: #374151;
+            line-height: 1.72
+        }
+        
+        .m-body h4 {
+            color: #0B3D91;
+            font-size: .79rem;
+            margin: 15px 0 5px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #e5e7eb
+        }
+        
+        .m-body h4:first-child {
+            margin-top: 0
+        }
+        
+        .m-foot {
+            padding: 13px 20px;
+            border-top: 1px solid #f0f0f0;
+            flex-shrink: 0;
+            display: flex;
+            gap: 8px
+        }
+        
+        .m-close {
+            flex: 1;
+            background: #f3f4f6;
+            border: none;
+            border-radius: 9px;
+            padding: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: .84rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: #6b7280
+        }
+        
+        .m-accept {
+            flex: 2;
+            background: #0B3D91;
+            border: none;
+            border-radius: 9px;
+            padding: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: .84rem;
+            font-weight: 700;
+            cursor: pointer;
+            color: #fff
+        }
+        
+        .pulse {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #FF671F;
+            animation: blink 1s ease-in-out infinite;
+            margin-right: 4px;
+            vertical-align: middle
+        }
+        
+        @keyframes blink {
+            0%,
+            100% {
+                opacity: 1
+            }
+            50% {
+                opacity: .15
+            }
+        }
+        /* TAB ANIMATIONS */
+        
+        .scr {
+            display: none;
+            animation: none
+        }
+        
+        .scr.on {
+            display: block;
+            animation: slideIn .3s ease
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+        /* Tab indicator animation */
+        
+        .tab {
+            position: relative;
+            overflow: hidden
+        }
+        
+        .tab::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            right: 50%;
+            height: 2.5px;
+            background: #0B3D91;
+            transition: left .3s ease, right .3s ease;
+        }
+        
+        .tab.on::after {
+            left: 0;
+            right: 0
+        }
+        /* ════ ROAD ANIMATION ════ */
+        
+        .road-scene {
+            width: 100%;
+            position: relative;
+            height: 64px;
+            margin-top: auto;
+            flex-shrink: 0;
+            overflow: hidden;
+            /* pushed below card by flex layout */
+        }
+        
+        .road-strip {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 36px;
+            background: linear-gradient(to bottom, #1e3a5f, #162d4a);
+        }
+        /* Road surface lines */
+        
+        .road-line {
+            position: absolute;
+            bottom: 14px;
+            height: 4px;
+            border-radius: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .55), transparent);
+            animation: roadLine 2.8s linear infinite;
+        }
+        
+        .road-line:nth-child(1) {
+            width: 60px;
+            animation-delay: 0s
+        }
+        
+        .road-line:nth-child(2) {
+            width: 50px;
+            animation-delay: .9s
+        }
+        
+        .road-line:nth-child(3) {
+            width: 55px;
+            animation-delay: 1.8s
+        }
+        
+        .road-line:nth-child(4) {
+            width: 45px;
+            animation-delay: 2.4s
+        }
+        
+        @keyframes roadLine {
+            from {
+                left: 110%;
+                opacity: 0
+            }
+            5% {
+                opacity: 1
+            }
+            95% {
+                opacity: 1
+            }
+            to {
+                left: -80px;
+                opacity: 0
+            }
+        }
+        /* Road edge lines */
+        
+        .road-edge-top {
+            position: absolute;
+            bottom: 32px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(255, 200, 50, .3)
+        }
+        
+        .road-edge-bot {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(255, 200, 50, .25)
+        }
+        /* VEHICLES */
+        
+        .vehicle {
+            position: absolute;
+            bottom: 4px;
+            animation: drive linear infinite
+        }
+        /* CAR 1 — sedan */
+        
+        .car1 {
+            animation-duration: 6s;
+            animation-delay: 0s
+        }
+        
+        .car1 svg {
+            width: 52px;
+            height: 22px
+        }
+        /* CAR 2 — hatchback smaller */
+        
+        .car2 {
+            animation-duration: 8s;
+            animation-delay: -3s
+        }
+        
+        .car2 svg {
+            width: 44px;
+            height: 19px
+        }
+        /* CAR 3 — SUV */
+        
+        .car3 {
+            animation-duration: 7s;
+            animation-delay: -5s
+        }
+        
+        .car3 svg {
+            width: 56px;
+            height: 24px
+        }
+        /* BIKE 1 */
+        
+        .bike1 {
+            animation-duration: 4.5s;
+            animation-delay: -1s
+        }
+        
+        .bike1 svg {
+            width: 30px;
+            height: 20px
+        }
+        /* BIKE 2 — faster */
+        
+        .bike2 {
+            animation-duration: 3.8s;
+            animation-delay: -2.5s
+        }
+        
+        .bike2 svg {
+            width: 26px;
+            height: 18px
+        }
+        /* TRUCK */
+        
+        .truck1 {
+            animation-duration: 9s;
+            animation-delay: -4s
+        }
+        
+        .truck1 svg {
+            width: 68px;
+            height: 26px
+        }
+        /* AUTORICKSHAW */
+        
+        .auto1 {
+            animation-duration: 5.5s;
+            animation-delay: -6s
+        }
+        
+        .auto1 svg {
+            width: 38px;
+            height: 22px
+        }
+        
+        @keyframes drive {
+            from {
+                left: 108%;
+                transform: scaleX(1)
+            }
+            to {
+                left: -80px;
+                transform: scaleX(1)
+            }
+        }
+        /* Stars/sky above road */
+        
+        .sky-strip {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 28px;
+            background: linear-gradient(to bottom, transparent, rgba(11, 61, 145, .08));
+        }
+        
+        .road-glow {
+            position: absolute;
+            bottom: 2px;
+            left: 0;
+            right: 0;
+            height: 12px;
+            background: linear-gradient(to top, rgba(255, 180, 0, .06), transparent);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ════ SPLASH ════ -->
+    <div id="splash">
+        <div class="sp-logo-wrap">
+            <div class="sp-ring1"></div>
+            <div class="sp-ring2"></div>
+            <svg width="80" height="80" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <path d="M100 8L172 38L172 108Q172 158 100 192Q28 158 28 108L28 38Z" fill="#0B3D91"/>
+      <path d="M100 22L158 48L158 108Q158 148 100 178Q42 148 42 108L42 48Z" fill="#1150b8"/>
+      <path d="M65 148L82 80L118 80L135 148Z" fill="rgba(255,255,255,0.07)"/>
+      <rect x="97" y="130" width="6" height="12" rx="3" fill="rgba(255,255,255,0.55)"/>
+      <rect x="97" y="110" width="6" height="10" rx="3" fill="rgba(255,255,255,0.40)"/>
+      <rect x="97" y="93"  width="6" height="8"  rx="3" fill="rgba(255,255,255,0.25)"/>
+      <path d="M60 96L60 78L78 78" fill="none" stroke="#FF671F" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M140 96L140 78L122 78" fill="none" stroke="#FF671F" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="100" cy="112" r="14" fill="none" stroke="#FF671F" stroke-width="3.5"/>
+      <circle cx="100" cy="112" r="5" fill="#FF671F"/>
+      <circle cx="100" cy="112" r="22" fill="none" stroke="#FF671F" stroke-width="1.5" opacity="0.35"/>
+    </svg>
+        </div>
+        <div class="sp-name"><span class="s">SADAK</span><span class="a">AI</span></div>
+        <div class="sp-sub">Smart Road Guardian</div>
+        <div class="sp-gov">
+            <div class="sp-flag">
+                <i style="background:#FF9933"></i>
+                <i style="background:#fff"></i>
+                <i style="background:#138808"></i>
+            </div>
+            <span class="sp-gov-txt">Government of India Initiative</span>
+        </div>
+        <div class="sp-progress">
+            <div class="sp-track">
+                <div class="sp-fill" id="spFill"></div>
+            </div>
+            <div class="sp-lbl" id="spLbl">Initialising...</div>
+        </div>
+    </div>
+
+    <div class="pg-bg"></div>
+
+    <!-- ════ PAGE ════ -->
+    <div class="page">
+
+        <!-- GOV BAR -->
+        <div class="govbar">
+            <div class="gov-em">&#9784;</div>
+            <div class="gov-t"><b>Government of India</b><span>Ministry of Road Transport &amp; Highways</span></div>
+            <div class="gov-tc">
+                <div style="background:#FF9933"></div>
+                <div style="background:#fff"></div>
+                <div style="background:#138808"></div>
+            </div>
+        </div>
+
+        <!-- HERO -->
+        <div class="hero">
+            <svg class="hero-logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <path d="M100 8L172 38L172 108Q172 158 100 192Q28 158 28 108L28 38Z" fill="rgba(255,255,255,0.11)"/>
+      <path d="M100 22L158 48L158 108Q158 148 100 178Q42 148 42 108L42 48Z" fill="rgba(255,255,255,0.14)"/>
+      <path d="M65 148L82 80L118 80L135 148Z" fill="rgba(255,255,255,0.06)"/>
+      <rect x="97" y="130" width="6" height="12" rx="3" fill="rgba(255,255,255,0.6)"/>
+      <rect x="97" y="110" width="6" height="10" rx="3" fill="rgba(255,255,255,0.45)"/>
+      <rect x="97" y="93"  width="6" height="8"  rx="3" fill="rgba(255,255,255,0.28)"/>
+      <path d="M60 96L60 78L78 78" fill="none" stroke="#FF671F" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M140 96L140 78L122 78" fill="none" stroke="#FF671F" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="100" cy="112" r="14" fill="none" stroke="#FF671F" stroke-width="3.5"/>
+      <circle cx="100" cy="112" r="5" fill="#FF671F"/>
+      <circle cx="100" cy="112" r="22" fill="none" stroke="#FF671F" stroke-width="1.5" opacity="0.42"/>
+    </svg>
+            <div class="hero-name"><span class="s">SADAK</span><span class="a">AI</span></div>
+            <div class="hero-sub">Smart Road Guardian</div>
+        </div>
+
+        <!-- CARD -->
+        <div class="card">
+            <div class="tabs">
+                <button class="tab on" id="tab-login" onclick="goTab('login')">Sign In</button>
+                <button class="tab" id="tab-reg" onclick="goTab('reg')">Register</button>
+            </div>
+            <div class="fb">
+
+                <!-- ══ LOGIN ══ -->
+                <div class="scr on" id="sc-login">
+                    <div class="hint">Sign in with your registered email or mobile number and password.</div>
+                    <div class="al err" id="l-err"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span id="l-err-t"></span></div>
+                    <div class="al ok" id="l-ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span id="l-ok-t"></span></div>
+
+                    <div class="fg">
+                        <label class="lbl">Email / Mobile Number</label>
+                        <input class="fi" id="l-id" type="text" placeholder="Email or 10-digit mobile number" autocomplete="username">
+                    </div>
+                    <div class="fg">
+                        <label class="lbl">Password</label>
+                        <div class="pw-r">
+                            <input class="fi" id="l-pw" type="password" placeholder="Enter your password" autocomplete="current-password" style="padding-right:40px">
+                            <button class="pw-eye" onclick="togglePw('l-pw')" tabindex="-1"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                        </div>
+                    </div>
+                    <button class="btn btn-nv" id="l-btn" onclick="doLogin()">
+          <span id="l-btn-t">Sign In</span><div class="spin" id="l-btn-s" style="display:none"></div>
+        </button>
+
+                    <!-- FORGOT PASSWORD - clearly visible -->
+                    <div class="fp-row">
+                        <button onclick="goTab('forgot')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0B3D91" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            Forgot Password?
+          </button>
+                    </div>
+
+                    <div class="div">New to SADAK AI?</div>
+                    <button class="btn btn-out" onclick="goTab('reg')">Create Account</button>
+                </div>
+
+                <!-- ══ REGISTER ══ -->
+                <div class="scr" id="sc-reg">
+                    <div class="al err" id="r-err"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span id="r-err-t"></span></div>
+                    <div class="al ok" id="r-ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span id="r-ok-t"></span></div>
+
+                    <!-- TERMS GATE — shown first -->
+                    <div id="tgate">
+                        <div class="terms-gate-header">
+                            <div class="terms-gate-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                            <div class="terms-gate-title">Before you register</div>
+                            <div class="terms-gate-sub">Please read and accept our Terms &amp; Conditions and Privacy Policy to create your SADAK AI account.</div>
+                        </div>
+
+                        <div class="terms-chk-wrap" id="tchk-wrap">
+                            <label class="terms-chk-label">
+              <input type="checkbox" id="tchk" onchange="onTchk()">
+              <span>I have read, understood and agree to the
+                <button type="button" onclick="openM('terms')">Terms &amp; Conditions</button>
+                and
+                <button type="button" onclick="openM('privacy')">Privacy Policy</button>
+                of SADAK AI — National Road Intelligence System, Government of India.
+              </span>
+            </label>
+                        </div>
+
+                        <div class="terms-btns">
+                            <button class="btn btn-out" onclick="openM('terms')">Read Terms</button>
+                            <button class="btn btn-out" onclick="openM('privacy')">Read Privacy</button>
+                        </div>
+                        <button class="btn btn-nv" id="agree-btn" onclick="proceedReg()" disabled style="opacity:.55;margin-top:8px">
+            <span id="agree-t">I Agree — Continue to Register</span>
+            <div class="spin" id="agree-s" style="display:none"></div>
+          </button>
+                    </div>
+
+                    <!-- REGISTRATION FORM — hidden until agreed -->
+                    <div id="rform" style="display:none">
+                        <div class="al ok show" style="margin-bottom:14px">
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span>Terms accepted. Fill in the details below.</span>
+                        </div>
+
+                        <div class="fg"><label class="lbl">Full Name</label>
+                            <input class="fi" id="r-name" placeholder="As per Aadhaar card" autocomplete="name"></div>
+
+                        <div class="fg"><label class="lbl">Email Address</label>
+                            <div class="otp-row">
+                                <input class="fi" id="r-email" type="email" placeholder="yourname@gmail.com" autocomplete="email" style="font-size:.87rem">
+                                <button class="send-btn" id="otp-btn" onclick="sendOTP()">Send OTP</button>
+                            </div>
+                            <div class="note" id="otp-note">Click Send OTP — a 6-digit code will be emailed to you</div>
+                        </div>
+                        <div class="otp-f" id="otp-f">
+                            <label class="lbl">Enter OTP <span style="color:#aaa;font-weight:400;font-size:.65rem" id="otp-tmr"></span></label>
+                            <input class="fi otp-big" id="r-otp" type="text" placeholder="——————" maxlength="6" inputmode="numeric">
+                        </div>
+
+                        <div class="fg" style="margin-top:13px"><label class="lbl">Mobile Number</label>
+                            <input class="fi" id="r-phone" type="tel" placeholder="10-digit mobile number" maxlength="10" inputmode="numeric"></div>
+
+                        <!-- GPS -->
+                        <div class="loc-card">
+                            <div class="loc-top">
+                                <div class="loc-ic"><svg viewBox="0 0 24 24"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0112 2a8 8 0 018 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg></div>
+                                <div style="flex:1">
+                                    <div class="loc-title">Auto-detect Location</div>
+                                    <div class="loc-sub">Fills State, District &amp; Village via GPS</div>
+                                </div>
+                                <button class="gps-btn" id="gps-btn" onclick="startGPS()">Detect GPS</button>
+                            </div>
+                            <div class="loc-res" id="loc-res">
+                                <span class="loc-ok">&#10003;</span>
+                                <div style="flex:1">
+                                    <div class="loc-place" id="loc-place"></div>
+                                    <div class="loc-coord" id="loc-coord"></div>
+                                </div>
+                                <button class="loc-edit" onclick="openManual()">Edit</button>
+                            </div>
+                        </div>
+                        <div class="manual" id="manual">
+                            <div class="manual-h">&#9998; Select location</div>
+                            <div class="fg"><label class="lbl">State / UT</label>
+                                <select class="fi fi-sel" id="r-state" onchange="onState()"><option value="">— Select State / UT —</option></select></div>
+                            <div class="r2">
+                                <div class="fg"><label class="lbl">District</label>
+                                    <select class="fi fi-sel" id="r-dist" disabled onchange="onDist()"><option value="">— Select —</option></select></div>
+                                <div class="fg"><label class="lbl">Village <span class="opt">(optional)</span></label>
+                                    <select class="fi fi-sel" id="r-vil" disabled><option value="">— Select —</option></select></div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="h-s"><input type="hidden" id="h-d"><input type="hidden" id="h-v">
+
+                        <div class="fg"><label class="lbl">Create Password</label>
+                            <div class="pw-r">
+                                <input class="fi" id="r-pw" type="password" placeholder="Min 8 chars, 1 uppercase, 1 number" oninput="pwBar('r')" autocomplete="new-password" style="padding-right:40px">
+                                <button class="pw-eye" onclick="togglePw('r-pw')" tabindex="-1"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                            </div>
+                            <div class="pw-bars">
+                                <div class="pw-bar" id="rpb1"></div>
+                                <div class="pw-bar" id="rpb2"></div>
+                                <div class="pw-bar" id="rpb3"></div>
+                                <div class="pw-bar" id="rpb4"></div>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-nv" id="r-btn" onclick="doReg()">
+            <span id="r-btn-t">Create Account</span><div class="spin" id="r-btn-s" style="display:none"></div>
+          </button>
+                        <button class="btn btn-out" onclick="resetGate()" style="font-size:.75rem;color:#6b7280;border-color:#e5e7eb">&#8592; Back</button>
+                    </div>
+                </div>
+
+                <!-- ══ FORGOT PASSWORD ══ -->
+                <div class="scr" id="sc-forgot">
+                    <div class="al err" id="fp-err"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span id="fp-err-t"></span></div>
+                    <div class="al warn" id="fp-warn"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span id="fp-warn-t"></span></div>
+
+                    <!-- step dots -->
+                    <div class="steps">
+                        <div style="text-align:center">
+                            <div class="step-dot act" id="sd1">1</div><span class="step-lbl">Email</span></div>
+                        <div class="step-line" id="sl1"></div>
+                        <div style="text-align:center">
+                            <div class="step-dot" id="sd2">2</div><span class="step-lbl">Verify Code</span></div>
+                        <div class="step-line" id="sl2"></div>
+                        <div style="text-align:center">
+                            <div class="step-dot" id="sd3">3</div><span class="step-lbl">New Password</span></div>
+                    </div>
+
+                    <!-- Step 1 -->
+                    <div id="fps1">
+                        <div class="ibox blue">Enter your registered email. We will send a 6-digit reset code to your inbox.</div>
+                        <div class="fg"><label class="lbl">Registered Email Address</label>
+                            <input class="fi" id="fp-em" type="email" placeholder="yourname@gmail.com" autocomplete="email"></div>
+                        <button class="btn btn-nv" id="fps1-btn" onclick="fpSend()">
+            <span id="fps1-t">Send Reset Code</span><div class="spin" id="fps1-s" style="display:none"></div>
+          </button>
+                        <div class="div">Remember your password?</div>
+                        <button class="btn btn-out" onclick="goTab('login')">&#8592; Back to Sign In</button>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div id="fps2" style="display:none">
+                        <div class="ibox green">&#10003;&nbsp;Reset code sent to <em id="fp-show-em"></em>. Open your inbox now.</div>
+                        <div class="fg">
+                            <label class="lbl">6-Digit Reset Code <span style="color:#aaa;font-weight:400;font-size:.65rem" id="fp-tmr"></span></label>
+                            <input class="fi otp-big" id="fp-otp" type="text" placeholder="——————" maxlength="6" inputmode="numeric">
+                        </div>
+                        <button class="btn btn-nv" id="fps2-btn" onclick="fpVerify()">
+            <span id="fps2-t">Verify Code</span><div class="spin" id="fps2-s" style="display:none"></div>
+          </button>
+                        <button class="btn btn-out" onclick="fpBack()">Use different email</button>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div id="fps3" style="display:none">
+                        <div class="ibox green">&#10003;&nbsp;Code verified. Set a new password for <em id="fp-show-em2"></em>.</div>
+                        <div class="fg"><label class="lbl">New Password</label>
+                            <div class="pw-r">
+                                <input class="fi" id="fp-pw" type="password" placeholder="Min 8 chars, 1 uppercase, 1 number" oninput="pwBar('fp')" style="padding-right:40px">
+                                <button class="pw-eye" onclick="togglePw('fp-pw')" tabindex="-1"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                            </div>
+                            <div class="pw-bars">
+                                <div class="pw-bar" id="fpb1"></div>
+                                <div class="pw-bar" id="fpb2"></div>
+                                <div class="pw-bar" id="fpb3"></div>
+                                <div class="pw-bar" id="fpb4"></div>
+                            </div>
+                        </div>
+                        <div class="fg"><label class="lbl">Confirm New Password</label>
+                            <div class="pw-r">
+                                <input class="fi" id="fp-pw2" type="password" placeholder="Re-enter new password" style="padding-right:40px">
+                                <button class="pw-eye" onclick="togglePw('fp-pw2')" tabindex="-1"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                            </div>
+                        </div>
+                        <button class="btn btn-nv" id="fps3-btn" onclick="fpReset()">
+            <span id="fps3-t">Update Password</span><div class="spin" id="fps3-s" style="display:none"></div>
+          </button>
+                    </div>
+                </div>
+
+            </div>
+            <div class="card-foot">
+                <p>By registering you agree to our <a href="#" onclick="openM('terms');return false">Terms</a> and <a href="#" onclick="openM('privacy');return false">Privacy Policy</a>.<br> Protected under IT Act 2000 &bull; Government of India &bull; Secure
+                    &amp; Encrypted</p>
+            </div>
+        </div>
+
+
+        <!-- ════ ROAD ANIMATION ════ -->
+        <div class="road-scene" id="roadScene">
+            <div class="sky-strip"></div>
+            <div class="road-strip">
+                <div class="road-edge-top"></div>
+                <div class="road-edge-bot"></div>
+                <!-- dashes -->
+                <div class="road-line"></div>
+                <div class="road-line"></div>
+                <div class="road-line"></div>
+                <div class="road-line"></div>
+                <div class="road-glow"></div>
+            </div>
+
+            <!-- TRUCK (slowest, at back) -->
+            <div class="vehicle truck1">
+                <svg viewBox="0 0 68 26" xmlns="http://www.w3.org/2000/svg">
+      <!-- body -->
+      <rect x="14" y="6" width="50" height="14" rx="2" fill="#2d6a9f"/>
+      <rect x="14" y="6" width="50" height="5" rx="1" fill="#3a7fbf"/>
+      <!-- cab -->
+      <rect x="2" y="9" width="16" height="11" rx="2" fill="#1e5280"/>
+      <rect x="4" y="10" width="10" height="6" rx="1" fill="#7ec8e3" opacity=".85"/>
+      <!-- stripe -->
+      <rect x="14" y="13" width="50" height="2" fill="rgba(255,103,31,.6)"/>
+      <!-- wheels -->
+      <circle cx="10" cy="22" r="4" fill="#1a1a2e"/>
+      <circle cx="10" cy="22" r="2" fill="#444"/>
+      <circle cx="26" cy="22" r="4" fill="#1a1a2e"/>
+      <circle cx="26" cy="22" r="2" fill="#444"/>
+      <circle cx="54" cy="22" r="4" fill="#1a1a2e"/>
+      <circle cx="54" cy="22" r="2" fill="#444"/>
+      <!-- headlight -->
+      <rect x="0" y="14" width="3" height="3" rx=".5" fill="#fff9c4"/>
+    </svg>
+            </div>
+
+            <!-- CAR 1 — sedan, orange -->
+            <div class="vehicle car1">
+                <svg viewBox="0 0 52 22" xmlns="http://www.w3.org/2000/svg">
+      <rect x="4" y="9" width="44" height="10" rx="2" fill="#e65c00"/>
+      <path d="M10 9 Q12 4 18 4 L34 4 Q40 4 42 9Z" fill="#cc5200"/>
+      <rect x="13" y="4.5" width="10" height="4.5" rx="1" fill="#aee6f7" opacity=".9"/>
+      <rect x="25" y="4.5" width="9" height="4.5" rx="1" fill="#aee6f7" opacity=".9"/>
+      <circle cx="11" cy="20" r="3.5" fill="#111"/>
+      <circle cx="11" cy="20" r="1.8" fill="#333"/>
+      <circle cx="40" cy="20" r="3.5" fill="#111"/>
+      <circle cx="40" cy="20" r="1.8" fill="#333"/>
+      <rect x="0" y="12" width="5" height="3" rx=".5" fill="#fff9c4"/>
+      <rect x="47" y="12" width="3" height="2" rx=".5" fill="#ff6b6b" opacity=".8"/>
+    </svg>
+            </div>
+
+            <!-- CAR 2 — hatchback, white/grey -->
+            <div class="vehicle car2">
+                <svg viewBox="0 0 44 19" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="8" width="40" height="9" rx="2" fill="#e8e8e8"/>
+      <path d="M8 8 Q10 3 16 3 L30 3 Q36 3 38 8Z" fill="#d0d0d0"/>
+      <rect x="11" y="3.5" width="8" height="4.5" rx="1" fill="#aee6f7" opacity=".9"/>
+      <rect x="21" y="3.5" width="8" height="4.5" rx="1" fill="#aee6f7" opacity=".9"/>
+      <circle cx="9" cy="17" r="3" fill="#111"/>
+      <circle cx="9" cy="17" r="1.5" fill="#333"/>
+      <circle cx="35" cy="17" r="3" fill="#111"/>
+      <circle cx="35" cy="17" r="1.5" fill="#333"/>
+      <rect x="0" y="10" width="3" height="2.5" rx=".5" fill="#fff9c4"/>
+    </svg>
+            </div>
+
+            <!-- CAR 3 — SUV, dark blue -->
+            <div class="vehicle car3">
+                <svg viewBox="0 0 56 24" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="8" width="50" height="12" rx="2.5" fill="#0d3b6e"/>
+      <path d="M9 8 Q11 3 18 3 L40 3 Q47 3 49 8Z" fill="#0a2d56"/>
+      <rect x="13" y="3.5" width="10" height="4.5" rx="1" fill="#7ec8e3" opacity=".85"/>
+      <rect x="25" y="3.5" width="12" height="4.5" rx="1" fill="#7ec8e3" opacity=".85"/>
+      <!-- roof rack -->
+      <rect x="11" y="2.5" width="30" height="1.5" rx=".5" fill="#999"/>
+      <circle cx="11" cy="21" r="4" fill="#111"/>
+      <circle cx="11" cy="21" r="2" fill="#333"/>
+      <circle cx="43" cy="21" r="4" fill="#111"/>
+      <circle cx="43" cy="21" r="2" fill="#333"/>
+      <rect x="0" y="11" width="4" height="3" rx=".5" fill="#fff176"/>
+      <rect x="52" y="11" width="3" height="2" rx=".5" fill="#ff6b6b" opacity=".7"/>
+    </svg>
+            </div>
+
+            <!-- BIKE 1 — red motorcycle -->
+            <div class="vehicle bike1">
+                <svg viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg">
+      <!-- frame -->
+      <path d="M6 13 L14 7 L22 13" fill="none" stroke="#e53935" stroke-width="2" stroke-linecap="round"/>
+      <path d="M14 7 L14 13" fill="none" stroke="#e53935" stroke-width="1.5"/>
+      <!-- fuel tank -->
+      <ellipse cx="14" cy="9" rx="4" ry="2.5" fill="#e53935"/>
+      <!-- seat -->
+      <rect x="13" y="6.5" width="6" height="2" rx="1" fill="#b71c1c"/>
+      <!-- handlebars -->
+      <path d="M6 9 L8 7" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round"/>
+      <!-- rider -->
+      <circle cx="15" cy="5" r="2.5" fill="#f5cba7"/>
+      <rect x="12" y="7" width="6" height="4" rx="1" fill="#1565c0"/>
+      <!-- wheels -->
+      <circle cx="6" cy="15" r="4" fill="#111"/>
+      <circle cx="6" cy="15" r="2" fill="#333"/>
+      <circle cx="24" cy="15" r="4" fill="#111"/>
+      <circle cx="24" cy="15" r="2" fill="#333"/>
+    </svg>
+            </div>
+
+            <!-- BIKE 2 — green scooter -->
+            <div class="vehicle bike2">
+                <svg viewBox="0 0 26 18" xmlns="http://www.w3.org/2000/svg">
+      <!-- body -->
+      <path d="M5 11 Q8 6 14 7 L19 11" fill="#43a047" stroke="#2e7d32" stroke-width=".8"/>
+      <ellipse cx="13" cy="8.5" rx="4" ry="2" fill="#43a047"/>
+      <!-- rider -->
+      <circle cx="14" cy="5" r="2.2" fill="#f5cba7"/>
+      <rect x="11" y="7" width="6" height="3.5" rx="1" fill="#8e24aa"/>
+      <!-- step -->
+      <rect x="8" y="10" width="6" height="2" rx=".5" fill="#388e3c"/>
+      <!-- wheels -->
+      <circle cx="5" cy="14" r="3.5" fill="#111"/>
+      <circle cx="5" cy="14" r="1.8" fill="#333"/>
+      <circle cx="21" cy="14" r="3.5" fill="#111"/>
+      <circle cx="21" cy="14" r="1.8" fill="#333"/>
+      <!-- headlight -->
+      <circle cx="3" cy="11" r="1" fill="#fff9c4"/>
+    </svg>
+            </div>
+
+            <!-- AUTO RICKSHAW -->
+            <div class="vehicle auto1">
+                <svg viewBox="0 0 38 22" xmlns="http://www.w3.org/2000/svg">
+      <!-- body yellow -->
+      <rect x="6" y="5" width="28" height="13" rx="3" fill="#f9a825"/>
+      <!-- top -->
+      <rect x="9" y="2" width="22" height="5" rx="2" fill="#f57f17"/>
+      <!-- windows -->
+      <rect x="10" y="5.5" width="8" height="5" rx="1" fill="#aee6f7" opacity=".85"/>
+      <rect x="20" y="5.5" width="8" height="5" rx="1" fill="#aee6f7" opacity=".85"/>
+      <!-- black stripe -->
+      <rect x="6" y="11" width="28" height="2" fill="#333"/>
+      <!-- front -->
+      <rect x="2" y="8" width="6" height="8" rx="1.5" fill="#e65100"/>
+      <rect x="3" y="9" width="4" height="4" rx=".5" fill="#aee6f7" opacity=".7"/>
+      <!-- wheels -->
+      <circle cx="10" cy="19" r="3.5" fill="#111"/>
+      <circle cx="10" cy="19" r="1.8" fill="#333"/>
+      <circle cx="28" cy="19" r="3.5" fill="#111"/>
+      <circle cx="28" cy="19" r="1.8" fill="#333"/>
+      <!-- headlight -->
+      <circle cx="1" cy="12" r="1.2" fill="#fff9c4"/>
+    </svg>
+            </div>
+
+        </div>
+
+    </div>
+    <!-- end page -->
+
+    <!-- ════ TERMS MODAL ════ -->
+    <div class="modal" id="terms-modal" onclick="if(event.target===this)closeM('terms')">
+        <div class="m-sheet">
+            <div class="m-head">
+                <div class="m-head-ic"><svg viewBox="0 0 24 24"><path d="M9 12h6M9 16h6M9 8h6M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg></div>
+                <div>
+                    <div class="m-head-title">Terms &amp; Conditions</div>
+                    <div class="m-head-sub">SADAK AI — National Road Intelligence System</div>
+                </div>
+                <button class="m-x" onclick="closeM('terms')">&#x2715;</button>
+            </div>
+            <div class="m-body">
+                <div style="background:#eff6ff;border-left:3px solid #0B3D91;padding:9px 12px;border-radius:0 8px 8px 0;margin-bottom:14px;font-size:.71rem;color:#1e40af">Effective upon registration &bull; Governed by laws of India &bull; Last updated March 2025</div>
+                <h4>1. Acceptance of Terms</h4>
+                <p>By using SADAK AI, you agree to be bound by these Terms and applicable laws of India including the Information Technology Act 2000, the Motor Vehicles Act 1988, and the NHAI Act 1988.</p>
+                <h4>2. Purpose &amp; Scope</h4>
+                <p>SADAK AI is a civic technology platform enabling Indian citizens to report road damage to appropriate government authorities. It supplements — not replaces — existing grievance mechanisms.</p>
+                <h4>3. User Eligibility</h4>
+                <p>You must be at least 18 years of age and a resident of India. All information provided — name, email, mobile, location — must be accurate and truthful. False information violates these Terms.</p>
+                <h4>4. Accurate Reporting Obligation</h4>
+                <p>File complaints only for genuine, personally observed road damage. False, malicious or duplicate complaints are prohibited and may result in account suspension and legal action under the IPC and IT Act 2000.</p>
+                <h4>5. AI Detection Disclaimer</h4>
+                <p>AI-generated assessments are advisory only. Do not rely solely on AI output for legal or safety-critical decisions. Developers make no warranties on absolute accuracy of AI classifications.</p>
+                <h4>6. Data Consent</h4>
+                <p>By registering, you consent to SADAK AI collecting and processing your name, email, mobile, GPS coordinates, and uploaded images for complaint routing and status updates. Data may be shared with NHAI, PWD, or Gram Panchayat as required.</p>
+                <h4>7. Prohibited Conduct</h4>
+                <p>You must not: use the app for unlawful purposes; hack or reverse-engineer the platform; upload defamatory content; impersonate government officials; submit bulk automated complaints.</p>
+                <h4>8. Account Security</h4>
+                <p>You are responsible for maintaining password confidentiality. SADAK AI will never ask for your password via email or phone. Report unauthorised access immediately to <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="30434540405f424470435154515b1d51591e595e">[email&#160;protected]</a>.</p>
+                <h4>9. Intellectual Property</h4>
+                <p>All software, AI models, branding and content are protected under the Copyright Act 1957. Unauthorised reproduction is prohibited.</p>
+                <h4>10. Limitation of Liability</h4>
+                <p>SADAK AI is not liable for damages from use of the application, delays in government resolution, or AI inaccuracies.</p>
+                <h4>11. Governing Law</h4>
+                <p>These Terms are governed by Indian law. Disputes are subject to the exclusive jurisdiction of courts in New Delhi, India.</p>
+                <h4>12. Modifications</h4>
+                <p style="margin-bottom:14px">We may modify these Terms with notice. Continued use constitutes acceptance. Significant changes will be emailed to you.</p>
+                <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:9px 12px;font-size:.7rem;color:#166534">&#10003; Compliant with IT Act 2000, IT (Amendment) Act 2008, and India's Personal Data Protection framework.</div>
+            </div>
+            <div class="m-foot">
+                <button class="m-close" onclick="closeM('terms')">Close</button>
+                <button class="m-accept" onclick="acceptFromModal()">&#10003; I Accept These Terms</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════ PRIVACY MODAL ════ -->
+    <div class="modal" id="privacy-modal" onclick="if(event.target===this)closeM('privacy')">
+        <div class="m-sheet">
+            <div class="m-head">
+                <div class="m-head-ic"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                <div>
+                    <div class="m-head-title">Privacy Policy</div>
+                    <div class="m-head-sub">How we collect, use, and protect your data</div>
+                </div>
+                <button class="m-x" onclick="closeM('privacy')">&#x2715;</button>
+            </div>
+            <div class="m-body">
+                <div style="background:#eff6ff;border-left:3px solid #0B3D91;padding:9px 12px;border-radius:0 8px 8px 0;margin-bottom:14px;font-size:.71rem;color:#1e40af">Last updated March 2025 &bull; SADAK AI is committed to protecting your personal data.</div>
+                <h4>1. Data We Collect</h4>
+                <p><strong>Identity:</strong> Name, email, mobile. <strong>Location:</strong> GPS coordinates, state, district, village. <strong>Complaint:</strong> Photos, descriptions, AI severity. <strong>Device:</strong> Browser, OS, IP (for security).
+                    <strong>Usage:</strong> Features accessed, timestamps.</p>
+                <h4>2. How We Use Your Data</h4>
+                <p>To route complaints to the correct authority; send status updates; improve AI accuracy using anonymised data; generate anonymised road quality reports; verify identity; comply with legal obligations.</p>
+                <h4>3. Data Sharing</h4>
+                <p>We share data only with relevant government authorities for complaint resolution, or when legally required by court order. We <strong>never</strong> sell your data to advertisers, brokers, or commercial third parties.</p>
+                <h4>4. Data Retention</h4>
+                <p>Account data retained while active plus 12 months. Resolved complaints retained 7 years for government audit compliance. Request deletion at <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c3b0b6b3b3acb1b783b0a2a7a2a8eea2aaedaaad">[email&#160;protected]</a>.</p>
+                <h4>5. Security</h4>
+                <p>All data transmitted via HTTPS/TLS 1.3. Passwords stored as PBKDF2-SHA256 hashes — we cannot read them. Regular security audits conducted. Breach notification within 72 hours.</p>
+                <h4>6. Your Rights</h4>
+                <p>You have the right to: access your data; correct inaccuracies; request erasure; withdraw consent; lodge a complaint with India's Data Protection Authority.</p>
+                <h4>7. Cookies</h4>
+                <p>Only essential authentication cookies (JWT session token) are used. No tracking, analytics, or advertising cookies.</p>
+                <h4>8. Third-Party Services</h4>
+                <p>OpenStreetMap for maps (no personal data shared). Gmail SMTP for verification emails (email address only). No other third parties access your data.</p>
+                <h4>9. Children's Privacy</h4>
+                <p style="margin-bottom:14px">SADAK AI is not for users under 18. We delete accounts of minors immediately upon discovery.</p>
+                <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:9px 12px;font-size:.7rem;color:#166534">Data Protection Officer: <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2f5c5a5f5f405d5b6f5c4e4b4e44024e46014641">[email&#160;protected]</a></strong></div>
+            </div>
+            <div class="m-foot">
+                <button class="m-close" onclick="closeM('privacy')">Close</button>
+                <button class="m-accept" onclick="acceptFromModal()">&#10003; Understood &amp; I Accept</button>
+            </div>
+        </div>
+    </div>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+    <script>
+        /* ═══════════════════════════════════════════════
+           SADAK AI — Login Page
+           Fixes: splash, register blank, forgot flow
+        ═══════════════════════════════════════════════ */
+
+        // ── SPLASH — bulletproof version ─────────────────────────
+        var SPLASH_MSGS = ['Initialising AI engine...', 'Loading location services...', 'Verifying security...', 'Ready ✓'];
+        var spPct = 0,
+            spMi = 0,
+            spDone = false;
+
+        function runSplash() {
+            var fill = document.getElementById('spFill');
+            var lbl = document.getElementById('spLbl');
+            if (!fill || !lbl) {
+                hideSplash();
+                return;
+            }
+
+            var iv = setInterval(function() {
+                spPct += 2.2;
+                fill.style.width = Math.min(spPct, 100) + '%';
+                if (spPct > 22 && spMi === 0) {
+                    spMi = 1;
+                    lbl.textContent = SPLASH_MSGS[1];
+                }
+                if (spPct > 52 && spMi === 1) {
+                    spMi = 2;
+                    lbl.textContent = SPLASH_MSGS[2];
+                }
+                if (spPct > 82 && spMi === 2) {
+                    spMi = 3;
+                    lbl.textContent = SPLASH_MSGS[3];
+                }
+                if (spPct >= 100) {
+                    clearInterval(iv);
+                    setTimeout(hideSplash, 500);
+                }
+            }, 40);
+        }
+
+        function hideSplash() {
+            if (spDone) return;
+            spDone = true;
+            var sp = document.getElementById('splash');
+            if (!sp) return;
+            sp.style.transition = 'opacity 0.6s ease';
+            sp.style.opacity = '0';
+            setTimeout(function() {
+                sp.style.display = 'none';
+            }, 650);
+        }
+
+        // Run splash when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', runSplash);
+        } else {
+            runSplash();
+        }
+        // Safety net — hide splash after 4s no matter what
+        setTimeout(hideSplash, 4000);
+
+        // ── Auto redirect ─────────────────────────────────────────
+        (function() {
+            var t = localStorage.getItem('sadak_token');
+            if (!t) return;
+            fetch('/api/auth/verify?token=' + t)
+                .then(function(r) {
+                    return r.json();
+                })
+                .then(function(d) {
+                    if (d.valid) location.href = '/home';
+                })
+                .catch(function() {});
+        })();
+
+        function saveSession(tok, user) {
+            localStorage.setItem('sadak_token', tok);
+            localStorage.setItem('sadak_user', JSON.stringify(user));
+            document.cookie = 'sadak_token=' + tok + '; path=/; SameSite=Lax; max-age=' + (30 * 24 * 3600);
+        }
+
+        // ── TABS ─────────────────────────────────────────────────
+        function goTab(t) {
+            ['login', 'reg', 'forgot'].forEach(function(id) {
+                var tab = document.getElementById('tab-' + id);
+                var sc = document.getElementById('sc-' + id);
+                if (tab) tab.classList.toggle('on', id === t || (t === 'forgot' && id === 'login'));
+                if (sc) {
+                    var wasOn = sc.classList.contains('on');
+                    sc.classList.toggle('on', id === t);
+                    // Re-trigger animation by forcing reflow
+                    if (!wasOn && id === t) {
+                        sc.style.animation = 'none';
+                        sc.offsetHeight; // reflow
+                        sc.style.animation = '';
+                    }
+                }
+            });
+            if (t === 'forgot') document.getElementById('tab-login').classList.add('on');
+            clearAlerts();
+            if (t === 'reg') loadStates();
+            // Smooth scroll to top of card
+            var card = document.querySelector('.card');
+            if (card) card.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest'
+            });
+        }
+
+        // ── ALERTS ───────────────────────────────────────────────
+        function E(id, msg) {
+            document.getElementById(id + '-t').textContent = msg;
+            document.getElementById(id).classList.add('show');
+        }
+
+        function clearAlerts() {
+            ['l-err', 'l-ok', 'r-err', 'r-ok', 'fp-err', 'fp-warn'].forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) el.classList.remove('show');
+            });
+        }
+
+        // ── MODALS ───────────────────────────────────────────────
+        function openM(which) {
+            document.getElementById(which + '-modal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeM(which) {
+            document.getElementById(which + '-modal').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        function acceptFromModal() {
+            ['terms', 'privacy'].forEach(function(w) {
+                closeM(w);
+            });
+            document.body.style.overflow = '';
+            var chk = document.getElementById('tchk');
+            if (chk) {
+                chk.checked = true;
+                onTchk();
+            }
+        }
+
+        // ── TERMS GATE ───────────────────────────────────────────
+        var termsOK = false;
+
+        function onTchk() {
+            var chk = document.getElementById('tchk');
+            var btn = document.getElementById('agree-btn');
+            var wrap = document.getElementById('tchk-wrap');
+            termsOK = chk.checked;
+            btn.disabled = !termsOK;
+            btn.style.opacity = termsOK ? '1' : '.55';
+            wrap.classList.toggle('ok', termsOK);
+        }
+
+        function proceedReg() {
+            if (!termsOK) return;
+            document.getElementById('tgate').style.display = 'none';
+            document.getElementById('rform').style.display = 'block';
+        }
+
+        function resetGate() {
+            document.getElementById('rform').style.display = 'none';
+            document.getElementById('tgate').style.display = 'block';
+        }
+
+        // ── OTP ──────────────────────────────────────────────────
+        var OTP_OK = false,
+            OTP_IV = null;
+
+        function sendOTP() {
+            clearAlerts();
+            var email = document.getElementById('r-email').value.trim();
+            if (!email || email.indexOf('@') < 1) {
+                E('r-err', 'Enter a valid email address.');
+                return;
+            }
+            var btn = document.getElementById('otp-btn');
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+            document.getElementById('otp-note').textContent = 'Sending code to ' + email + '...';
+
+            fetch('/api/auth/send-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email
+                    })
+                })
+                .then(function(r) {
+                    return r.json();
+                })
+                .then(function(d) {
+                    btn.disabled = false;
+                    if (!d.success) {
+                        E('r-err', d.message || 'Failed to send OTP.');
+                        btn.textContent = 'Send OTP';
+                        document.getElementById('otp-note').textContent = '';
+                        return;
+                    }
+                    OTP_OK = true;
+                    document.getElementById('otp-f').classList.add('show');
+                    document.getElementById('r-otp').focus();
+                    document.getElementById('otp-note').textContent = '✓ Code sent to ' + email + ' — open your inbox now';
+                    document.getElementById('otp-note').className = 'note ok';
+                    otpCd(btn, 'otp-tmr');
+                })
+                .catch(function() {
+                    btn.disabled = false;
+                    btn.textContent = 'Retry';
+                    E('r-err', 'Network error. Try again.');
+                });
+        }
+
+        function otpCd(btn, tid) {
+            var s = 60;
+            clearInterval(OTP_IV);
+            OTP_IV = setInterval(function() {
+                s--;
+                document.getElementById(tid).textContent = '(resend in ' + s + 's)';
+                if (btn) btn.textContent = 'Resend (' + s + 's)';
+                if (s <= 0) {
+                    clearInterval(OTP_IV);
+                    document.getElementById(tid).textContent = '';
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.textContent = 'Resend OTP';
+                    }
+                }
+            }, 1000);
+        }
+
+        // ── GPS ──────────────────────────────────────────────────
+        var GPS = {
+            s: '',
+            d: '',
+            v: '',
+            lat: 0,
+            lng: 0
+        };
+
+        function startGPS() {
+            var btn = document.getElementById('gps-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="pulse"></span>Detecting...';
+            if (!navigator.geolocation) {
+                btn.disabled = false;
+                btn.textContent = 'No GPS';
+                openManual();
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(
+                function(p) {
+                    geo1(p.coords.latitude, p.coords.longitude);
+                },
+                function(e) {
+                    btn.disabled = false;
+                    btn.textContent = 'Retry GPS';
+                    E('r-err', e.code === 1 ? 'Location permission denied.' : 'Location unavailable.');
+                    openManual();
+                }, {
+                    enableHighAccuracy: true,
+                    timeout: 12000,
+                    maximumAge: 0
+                }
+            );
+        }
+
+        function geo1(lat, lng) {
+            fetch('https://nominatim.openstreetmap.org/reverse?lat=' + lat + '&lon=' + lng + '&format=json&addressdetails=1&zoom=18&accept-language=en', {
+                    headers: {
+                        'User-Agent': 'SADAK-AI'
+                    }
+                })
+                .then(function(r) {
+                    return r.json();
+                })
+                .then(function(d) {
+                    var a = d.address || {};
+                    var st = (a.state || '').trim(),
+                        ds = (a.county || a.district || a.city_district || '').replace(/ *(District|Taluk|Tehsil|Mandal)$/i, '').trim();
+                    var vl = (a.village || a.town || a.suburb || a.city || a.neighbourhood || a.hamlet || '').trim();
+                    var pin = (a.postcode || '').trim();
+                    if (!st) {
+                        geo2(lat, lng);
+                        return;
+                    }
+                    applyGPS(st, ds, vl, lat, lng, pin);
+                }).catch(function() {
+                    geo2(lat, lng);
+                });
+        }
+
+        function geo2(lat, lng) {
+            fetch('https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=' + lat + '&longitude=' + lng + '&localityLanguage=en')
+                .then(function(r) {
+                    return r.json();
+                })
+                .then(function(d) {
+                    var st = (d.principalSubdivision || '').trim(),
+                        ds = (d.city || d.locality || '').trim(),
+                        vl = '';
+                    try {
+                        var a = d.localityInfo.administrative;
+                        for (var i = a.length - 1; i >= 0; i--) {
+                            if (a[i].adminLevel >= 6 && a[i].name) {
+                                vl = a[i].name;
+                                break;
+                            }
+                        }
+                    } catch (e) {}
+                    if (!st) {
+                        geoFail();
+                        return;
+                    }
+                    applyGPS(st, ds, vl, lat, lng, '');
+                }).catch(geoFail);
+        }
+
+        function geoFail() {
+            var btn = document.getElementById('gps-btn');
+            btn.disabled = false;
+            btn.textContent = 'Retry GPS';
+            E('r-err', 'Could not detect. Select manually.');
+            openManual();
+        }
+
+        function applyGPS(st, ds, vl, lat, lng, pin) {
+            GPS = {
+                s: st,
+                d: ds,
+                v: vl,
+                lat: lat,
+                lng: lng
+            };
+            document.getElementById('h-s').value = st;
+            document.getElementById('h-d').value = ds;
+            document.getElementById('h-v').value = vl;
+            var p = [st];
+            if (ds) p.push(ds);
+            if (vl) p.push(vl);
+            document.getElementById('loc-place').textContent = p.join(' \u203a ');
+            var sub = lat.toFixed(5) + '\u00b0N, ' + lng.toFixed(5) + '\u00b0E';
+            if (pin) sub += ' \u00b7 PIN ' + pin;
+            document.getElementById('loc-coord').textContent = sub;
+            document.getElementById('loc-res').classList.add('show');
+            var btn = document.getElementById('gps-btn');
+            btn.disabled = false;
+            btn.className = 'gps-btn done';
+            btn.textContent = '\u2713 Detected';
+            if (!_stOk) loadStates();
+        }
+
+        // ── DROPDOWNS ────────────────────────────────────────────
+        var _stOk = false;
+
+        function loadStates() {
+            if (_stOk) {
+                preS();
+                return;
+            }
+            var sel = document.getElementById('r-state');
+            sel.innerHTML = '<option value="">Loading...</option>';
+            fetch('/api/location/states').then(function(r) {
+                return r.json();
+            }).then(function(L) {
+                sel.innerHTML = '<option value="">— Select State / UT —</option>';
+                L.forEach(function(s) {
+                    var o = document.createElement('option');
+                    o.value = s.name;
+                    o.textContent = s.name + (s.type === 'UT' ? ' (UT)' : '');
+                    sel.appendChild(o);
+                });
+                _stOk = true;
+                preS();
+            }).catch(function() {
+                sel.innerHTML = '<option value="">— Select State / UT —</option>';
+            });
+        }
+
+        function openManual() {
+            document.getElementById('manual').classList.add('show');
+            loadStates();
+        }
+
+        function preS() {
+            var g = GPS.s;
+            if (!g) return;
+            var sel = document.getElementById('r-state');
+            for (var i = 0; i < sel.options.length; i++) {
+                var v = sel.options[i].value.toLowerCase(),
+                    gv = g.toLowerCase();
+                if (v === gv || v.indexOf(gv) >= 0 || gv.indexOf(v) >= 0) {
+                    sel.selectedIndex = i;
+                    loadD(sel.options[i].value, true);
+                    return;
+                }
+            }
+        }
+
+        function onState() {
+            var st = document.getElementById('r-state').value;
+            document.getElementById('h-s').value = st;
+            rSel('r-dist', '— Select District —');
+            rSel('r-vil', '— Select —');
+            document.getElementById('h-d').value = '';
+            document.getElementById('h-v').value = '';
+            if (st) loadD(st, false);
+        }
+
+        function loadD(st, pre) {
+            var sel = document.getElementById('r-dist');
+            sel.innerHTML = '<option value="">Loading...</option>';
+            sel.disabled = true;
+            fetch('/api/location/districts?state=' + encodeURIComponent(st)).then(function(r) {
+                return r.json();
+            }).then(function(L) {
+                sel.innerHTML = '<option value="">— Select District —</option>';
+                L.forEach(function(d) {
+                    var o = document.createElement('option');
+                    o.value = d;
+                    o.textContent = d;
+                    sel.appendChild(o);
+                });
+                sel.disabled = false;
+                if (pre) preD(st);
+            });
+        }
+
+        function preD(st) {
+            var g = GPS.d;
+            if (!g) return;
+            var sel = document.getElementById('r-dist');
+            for (var i = 0; i < sel.options.length; i++) {
+                var v = sel.options[i].value.toLowerCase(),
+                    gv = g.toLowerCase();
+                if (v === gv || v.indexOf(gv) >= 0 || gv.indexOf(v) >= 0) {
+                    sel.selectedIndex = i;
+                    document.getElementById('h-d').value = sel.options[i].value;
+                    loadV(st, sel.options[i].value, true);
+                    return;
+                }
+            }
+        }
+
+        function onDist() {
+            var st = document.getElementById('r-state').value,
+                ds = document.getElementById('r-dist').value;
+            document.getElementById('h-d').value = ds;
+            rSel('r-vil', '— Select —');
+            document.getElementById('h-v').value = '';
+            if (st && ds) loadV(st, ds, false);
+        }
+
+        function loadV(st, ds, pre) {
+            var sel = document.getElementById('r-vil');
+            sel.innerHTML = '<option value="">Loading...</option>';
+            sel.disabled = true;
+            fetch('/api/location/localities?state=' + encodeURIComponent(st) + '&district=' + encodeURIComponent(ds)).then(function(r) {
+                return r.json();
+            }).then(function(L) {
+                sel.innerHTML = '<option value="">— Select Town/Village —</option>';
+                L.forEach(function(l) {
+                    var o = document.createElement('option');
+                    o.value = l.name;
+                    o.textContent = l.name;
+                    sel.appendChild(o);
+                });
+                sel.disabled = false;
+                sel.onchange = function() {
+                    document.getElementById('h-v').value = this.value;
+                };
+                if (pre && GPS.v) {
+                    var g = GPS.v.toLowerCase();
+                    for (var i = 0; i < sel.options.length; i++) {
+                        var v = sel.options[i].value.toLowerCase();
+                        if (v === g || v.indexOf(g) >= 0 || g.indexOf(v) >= 0) {
+                            sel.selectedIndex = i;
+                            document.getElementById('h-v').value = sel.options[i].value;
+                            break;
+                        }
+                    }
+                }
+            });
+        }
+
+        function rSel(id, lbl) {
+            var sel = document.getElementById(id);
+            sel.innerHTML = '<option value="">' + lbl + '</option>';
+            sel.disabled = true;
+        }
+
+        // ── REGISTER ─────────────────────────────────────────────
+        function doReg() {
+            clearAlerts();
+            var name = document.getElementById('r-name').value.trim();
+            var email = document.getElementById('r-email').value.trim();
+            var otp = (document.getElementById('r-otp').value || '').trim();
+            var phone = document.getElementById('r-phone').value.trim();
+            var st = document.getElementById('h-s').value || document.getElementById('r-state').value;
+            var ds = document.getElementById('h-d').value || document.getElementById('r-dist').value;
+            var vl = document.getElementById('h-v').value || document.getElementById('r-vil').value;
+            var pw = document.getElementById('r-pw').value;
+            if (!name) {
+                E('r-err', 'Full name is required.');
+                return;
+            }
+            if (!email) {
+                E('r-err', 'Email address is required.');
+                return;
+            }
+            if (!OTP_OK) {
+                E('r-err', 'Please click Send OTP and verify your email first.');
+                return;
+            }
+            if (otp.length !== 6) {
+                E('r-err', 'Enter the 6-digit OTP from your email.');
+                return;
+            }
+            if (phone.length < 10) {
+                E('r-err', 'Enter a valid 10-digit mobile number.');
+                return;
+            }
+            if (pw.length < 8) {
+                E('r-err', 'Password must be at least 8 characters.');
+                return;
+            }
+            busy('r-btn', true);
+            fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        full_name: name,
+                        email: email,
+                        otp: otp,
+                        phone: phone,
+                        state: st,
+                        district: ds,
+                        village: vl,
+                        password: pw
+                    })
+                })
+                .then(function(r) {
+                    return r.json().then(function(d) {
+                        return {
+                            ok: r.ok,
+                            d: d
+                        };
+                    });
+                })
+                .then(function(res) {
+                    if (!res.ok) {
+                        E('r-err', res.d.error || 'Registration failed.');
+                        busy('r-btn', false);
+                        return;
+                    }
+                    saveSession(res.d.token, res.d.user);
+                    document.getElementById('r-ok-t').textContent = 'Account created! Redirecting...';
+                    document.getElementById('r-ok').classList.add('show');
+                    setTimeout(function() {
+                        location.href = '/home';
+                    }, 900);
+                })
+                .catch(function() {
+                    E('r-err', 'Network error. Try again.');
+                    busy('r-btn', false);
+                });
+        }
+
+        // ── LOGIN ────────────────────────────────────────────────
+        function doLogin() {
+            clearAlerts();
+            var id = document.getElementById('l-id').value.trim();
+            var pw = document.getElementById('l-pw').value;
+            if (!id) {
+                E('l-err', 'Email or mobile number is required.');
+                return;
+            }
+            if (!pw) {
+                E('l-err', 'Password is required.');
+                return;
+            }
+            busy('l-btn', true);
+            var body = {
+                password: pw
+            };
+            if (id.indexOf('@') > 0) body.email = id;
+            else body.phone = id;
+            fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                })
+                .then(function(r) {
+                    return r.json().then(function(d) {
+                        return {
+                            ok: r.ok,
+                            d: d
+                        };
+                    });
+                })
+                .then(function(res) {
+                    if (!res.ok) {
+                        E('l-err', res.d.error || 'Invalid credentials.');
+                        busy('l-btn', false);
+                        return;
+                    }
+                    saveSession(res.d.token, res.d.user);
+                    location.href = '/home';
+                })
+                .catch(function() {
+                    E('l-err', 'Network error. Try again.');
+                    busy('l-btn', false);
+                });
+        }
+
+        // ── FORGOT PASSWORD ──────────────────────────────────────
+        var fpEM = '',
+            fpOTP = '',
+            fpTimer = null;
+
+        function fpSend() {
+            clearAlerts();
+            var email = document.getElementById('fp-em').value.trim();
+            if (!email || email.indexOf('@') < 1) {
+                E('fp-err', 'Enter a valid email address.');
+                return;
+            }
+            fpEM = email;
+            busy('fps1-btn', true);
+            fetch('/api/auth/forgot-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email
+                    })
+                })
+                .then(function(r) {
+                    return r.json();
+                })
+                .then(function(d) {
+                    busy('fps1-btn', false);
+                    if (!d.success) {
+                        if (d.not_registered) {
+                            document.getElementById('fp-warn-t').innerHTML = 'No SADAK AI account found for <strong>' + escH(email) + '</strong>. <a href="#" onclick="goTab(\'reg\');return false" style="color:#92400e;font-weight:700;text-decoration:underline">Register here</a> to create a free account.';
+                            document.getElementById('fp-warn').classList.add('show');
+                        } else {
+                            E('fp-err', d.message || 'Failed to send reset code.');
+                        }
+                        return;
+                    }
+                    document.getElementById('fps1').style.display = 'none';
+                    document.getElementById('fps2').style.display = 'block';
+                    document.getElementById('fp-show-em').textContent = email;
+                    document.getElementById('fp-otp').focus();
+                    stepDone(1);
+                    var s = 60;
+                    clearInterval(fpTimer);
+                    fpTimer = setInterval(function() {
+                        s--;
+                        document.getElementById('fp-tmr').textContent = '(resend in ' + s + 's)';
+                        if (s <= 0) {
+                            clearInterval(fpTimer);
+                            document.getElementById('fp-tmr').textContent = '';
+                        }
+                    }, 1000);
+                })
+                .catch(function() {
+                    busy('fps1-btn', false);
+                    E('fp-err', 'Network error. Check connection.');
+                });
+        }
+
+        function fpVerify() {
+            clearAlerts();
+            var otp = document.getElementById('fp-otp').value.trim();
+            if (!otp || otp.length !== 6) {
+                E('fp-err', 'Enter the complete 6-digit reset code from your email.');
+                return;
+            }
+            fpOTP = otp;
+            document.getElementById('fps2').style.display = 'none';
+            document.getElementById('fps3').style.display = 'block';
+            document.getElementById('fp-show-em2').textContent = fpEM;
+            document.getElementById('fp-pw').focus();
+            stepDone(2);
+        }
+
+        function fpReset() {
+            clearAlerts();
+            var pw = document.getElementById('fp-pw').value;
+            var pw2 = document.getElementById('fp-pw2').value;
+            if (pw.length < 8) {
+                E('fp-err', 'Password must be at least 8 characters.');
+                return;
+            }
+            if (!/[A-Z]/.test(pw)) {
+                E('fp-err', 'Password must contain at least one uppercase letter.');
+                return;
+            }
+            if (!/[0-9]/.test(pw)) {
+                E('fp-err', 'Password must contain at least one number.');
+                return;
+            }
+            if (pw !== pw2) {
+                E('fp-err', 'Passwords do not match. Please re-enter carefully.');
+                return;
+            }
+            busy('fps3-btn', true);
+            fetch('/api/auth/reset-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: fpEM,
+                        otp: fpOTP,
+                        password: pw
+                    })
+                })
+                .then(function(r) {
+                    return r.json();
+                })
+                .then(function(d) {
+                    busy('fps3-btn', false);
+                    if (d.error) {
+                        E('fp-err', d.error);
+                        return;
+                    }
+                    stepDone(3);
+                    setTimeout(function() {
+                        // Reset forgot flow
+                        document.getElementById('fps1').style.display = 'block';
+                        document.getElementById('fps2').style.display = 'none';
+                        document.getElementById('fps3').style.display = 'none';
+                        document.getElementById('fp-em').value = '';
+                        document.getElementById('fp-otp').value = '';
+                        document.getElementById('fp-pw').value = '';
+                        document.getElementById('fp-pw2').value = '';
+                        fpEM = '';
+                        fpOTP = '';
+                        resetSteps();
+                        goTab('login');
+                        setTimeout(function() {
+                            document.getElementById('l-ok-t').textContent = '✓ Password updated successfully! Please sign in with your new password.';
+                            document.getElementById('l-ok').classList.add('show');
+                        }, 150);
+                    }, 1600);
+                })
+                .catch(function() {
+                    busy('fps3-btn', false);
+                    E('fp-err', 'Network error. Try again.');
+                });
+        }
+
+        function fpBack() {
+            clearAlerts();
+            document.getElementById('fps2').style.display = 'none';
+            document.getElementById('fps1').style.display = 'block';
+            resetStepTo(1);
+        }
+
+        function stepDone(n) {
+            var d = document.getElementById('sd' + n);
+            d.className = 'step-dot done';
+            d.textContent = '\u2713';
+            var l = document.getElementById('sl' + n);
+            if (l) l.classList.add('done');
+            var nx = document.getElementById('sd' + (n + 1));
+            if (nx) nx.className = 'step-dot act';
+        }
+
+        function resetSteps() {
+            for (var i = 1; i <= 3; i++) {
+                var d = document.getElementById('sd' + i);
+                d.className = 'step-dot' + (i === 1 ? ' act' : '');
+                d.textContent = i;
+            }[1, 2].forEach(function(i) {
+                document.getElementById('sl' + i).classList.remove('done');
+            });
+        }
+
+        function resetStepTo(n) {
+            for (var i = n; i <= 3; i++) {
+                var d = document.getElementById('sd' + i);
+                d.className = 'step-dot' + (i === n ? ' act' : '');
+                d.textContent = i;
+            }
+            for (var i = n; i <= 2; i++) {
+                document.getElementById('sl' + i).classList.remove('done');
+            }
+        }
+
+        // ── HELPERS ──────────────────────────────────────────────
+        function busy(id, on) {
+            var btn = document.getElementById(id);
+            var t = document.getElementById(id + '-t'),
+                s = document.getElementById(id + '-s');
+            if (btn) btn.disabled = on;
+            if (t) t.style.display = on ? 'none' : '';
+            if (s) s.style.display = on ? 'block' : 'none';
+        }
+
+        function togglePw(id) {
+            var el = document.getElementById(id);
+            el.type = el.type === 'password' ? 'text' : 'password';
+        }
+
+        function pwBar(p) {
+            var id = p === 'fp' ? 'fp-pw' : 'r-pw';
+            var v = document.getElementById(id).value;
+            var c = [v.length >= 8, /[A-Z]/.test(v), /[0-9]/.test(v), /[^a-zA-Z0-9]/.test(v)];
+            var col = ['#ef4444', '#f97316', '#eab308', '#16a34a'];
+            var sc = c.filter(Boolean).length;
+            var pre = p === 'fp' ? 'fpb' : 'rpb';
+            for (var i = 1; i <= 4; i++) document.getElementById(pre + i).style.background = i <= sc ? col[sc - 1] : '#ebebeb';
+        }
+
+        function escH(s) {
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+        document.addEventListener('keydown', function(e) {
+            if (e.key !== 'Enter') return;
+            var sc = document.querySelector('.scr.on');
+            if (!sc) return;
+            if (sc.id === 'sc-login') doLogin();
+            else if (sc.id === 'sc-reg') doReg();
+            else if (sc.id === 'sc-forgot') {
+                if (document.getElementById('fps3').style.display !== 'none') fpReset();
+                else if (document.getElementById('fps2').style.display !== 'none') fpVerify();
+                else fpSend();
+            }
+        });
+    </script>
+</body>
+
+</html>
