@@ -1,6 +1,7 @@
 <div align="center">
 
-<img src="static/logo-animated" width="100%" alt="SADAK AI — Smart Road Guardian"/>
+<img src="logo-animated.svg" width="100%" alt="SADAK AI — Smart Road Guardian"/>
+
  
 <br/>
 
