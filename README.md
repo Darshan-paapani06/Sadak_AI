@@ -1,7 +1,7 @@
 <div align="center">
 
 <img src="logo-animated" width="100%" alt="SADAK AI — Smart Road Guardian"/>
-
+ 
 <br/>
 
 <!-- TECH BADGES -->
