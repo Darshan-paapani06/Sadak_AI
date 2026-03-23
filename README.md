@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="banner.svg" width="100%" alt="SADAK AI — Smart Road Guardian"/>
+<img src="logo-animated" width="100%" alt="SADAK AI — Smart Road Guardian"/>
 
 <br/>
 
@@ -501,7 +501,7 @@ Phase 6 ── Cloud Integration 🆕
 
 ## Built with 🧡 for India's 1.4 Billion People
 
-**Developed by Darshan** — making Indian roads safer, one complaint at a time.
+**Developed by Darshan Paapani** — making Indian roads safer, one complaint at a time.
 
 *Every bug fixed, every iteration, every late night that went into this
 project was worth it — because roads save lives.*
@@ -524,4 +524,4 @@ project was worth it — because roads save lives.*
 *SADAK AI v3.0 · National Road Intelligence System*
 *Inspired by the Ministry of Road Transport & Highways · Government of India*
 
-</div>
+</div>   
