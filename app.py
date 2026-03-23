@@ -2,6 +2,11 @@
 SADAK AI v3 - Flask Application
 """
 import os, sys
+try:
+    from dotenv import load_dotenv
+    load_dotenv()  # loads .env file automatically
+except ImportError:
+    pass  # python-dotenv optional
 BASE_DIR   = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -29,6 +34,21 @@ from location_router import get_authority, validate_coordinates as lv, get_respo
 from complaint_engine import build_complaint, format_complaint_response
 from otp_manager import send_otp, verify_otp, send_reset_otp, verify_reset_otp
 from location_api import get_states, get_districts, get_localities
+# ── CLOUD SYNC (Supabase) ─────────────────────────────────
+try:
+    from cloud_sync import (
+        sync_complaint_filed, sync_complaint_updated,
+        sync_user_created, sync_user_deleted, sync_user_updated
+    )
+    CLOUD_SYNC = True
+except ImportError:
+    CLOUD_SYNC = False
+    def sync_complaint_filed(c): pass
+    def sync_complaint_updated(c): pass
+    def sync_user_created(u): pass
+    def sync_user_deleted(uid): pass
+    def sync_user_updated(u): pass
+
 try:
     from pdf_generator import generate_complaint_pdf as _gen_pdf
     PDF_OK = True
@@ -212,6 +232,7 @@ def register():
 
     token = generate_token(user["id"], user["email"], user["full_name"], user["role"])
     log_audit("REGISTER", "user", str(user["id"]), user["id"], get_client_ip())
+    sync_user_created(dict(user))
     return jsonify({"token": token, "user": _safe_user(user)}), 201
 
 @app.route("/api/auth/login", methods=["POST"])
@@ -503,6 +524,8 @@ def report_pothole():
     fmt = format_complaint_response(c)
     _broadcast("new_complaint", fmt)
     _broadcast("stats_updated", get_stats())
+    # ── Cloud sync ──
+    sync_complaint_filed(fmt)
     return jsonify({"success": True, "complaint": fmt,
                     "ai_result": detection.to_dict() if detection else None}), 201
 
@@ -541,6 +564,7 @@ def update_status(cid):
     c = get_complaint(cid.upper())
     fmt = format_complaint_response(c)
     _broadcast("complaint_updated", fmt)
+    sync_complaint_updated(fmt)
     return jsonify({"success": True, "complaint": fmt})
 
 @app.route("/api/stats")
@@ -765,6 +789,7 @@ def admin_make_admin(uid):
         with get_db() as conn:
             conn.execute("UPDATE users SET role=? WHERE id=?", (new_role, uid))
         log_audit("ROLE_CHANGED", "user", str(uid), admin_id, get_client_ip())
+        if db_user: sync_user_updated({**dict(db_user), "role": new_role})
         return jsonify({"success": True, "new_role": new_role,
                         "message": f"Role changed to {new_role}."})
     except Exception as e:

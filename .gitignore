@@ -1,50 +1,25 @@
-# Database (contains user data — never push)
-sadak_ai.db
-*.db-shm
-*.db-wal
-
-# Uploads (user images)
-uploads/
-static/uploads/
+# Environment secrets
+.env
+*.env
 
 # Python
 __pycache__/
-*.py[cod]
+*.pyc
 *.pyo
 *.pyd
-.Python
-*.egg-info/
-dist/
-build/
-.eggs/
 
-# Virtual environment
-venv/
-env/
-.venv/
+# Database (local - keep in cloud)
+sadak_ai.db
+uploads/
 
-# AI Model (too large for GitHub — add separately)
+# Models (large files)
 models/*.pt
-models/*.pth
-models/*.weights
+models/*.onnx
 
-# Environment & secrets
-.env
-*.env
-config.local.py
+# IDE
+.vscode/
+.idea/
 
-# OS files
+# OS
 .DS_Store
 Thumbs.db
-desktop.ini
-
-# VS Code
-.vscode/
-*.code-workspace
-
-# Logs
-*.log
-logs/
-
-# Test files
-test_email.py
