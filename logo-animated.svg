@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="160" height="160">
+  <defs>
+    <!-- Pulse animation for detection ring -->
+    <style>
+      .pulse-ring {
+        animation: pulse 2s ease-in-out infinite;
+        transform-origin: 100px 112px;
+      }
+      .pulse-ring2 {
+        animation: pulse 2s ease-in-out infinite 0.6s;
+        transform-origin: 100px 112px;
+      }
+      .scan-line {
+        animation: scan 2.5s ease-in-out infinite;
+      }
+      .dot-center {
+        animation: dotPulse 2s ease-in-out infinite;
+      }
+      .road-dash1 { animation: roadMove 1.8s linear infinite; }
+      .road-dash2 { animation: roadMove 1.8s linear infinite 0.6s; }
+      .road-dash3 { animation: roadMove 1.8s linear infinite 1.2s; }
+      .shield-glow { animation: glowShield 3s ease-in-out infinite; }
+      .corner-tl { animation: cornerBlink 2s ease-in-out infinite; }
+      .corner-tr { animation: cornerBlink 2s ease-in-out infinite 0.2s; }
+      .ashoka { animation: spinWheel 8s linear infinite; transform-origin: 100px 162px; }
+
+      @keyframes pulse {
+        0%,100% { opacity: 0.15; transform: scale(1); }
+        50%      { opacity: 0.55; transform: scale(1.18); }
+      }
+      @keyframes scan {
+        0%,100% { opacity: 1; }
+        50%      { opacity: 0.4; }
+      }
+      @keyframes dotPulse {
+        0%,100% { r: 5; opacity: 1; }
+        50%      { r: 7; opacity: 0.7; }
+      }
+      @keyframes roadMove {
+        0%   { transform: translateY(0px);   opacity: 0.55; }
+        100% { transform: translateY(16px);  opacity: 0; }
+      }
+      @keyframes glowShield {
+        0%,100% { filter: drop-shadow(0 0 6px rgba(11,61,145,0.4)); }
+        50%      { filter: drop-shadow(0 0 18px rgba(255,103,31,0.5)); }
+      }
+      @keyframes cornerBlink {
+        0%,100% { opacity: 1; stroke: #FF671F; }
+        50%      { opacity: 0.5; stroke: #ffaa44; }
+      }
+      @keyframes spinWheel {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(360deg); }
+      }
+    </style>
+    <radialGradient id="shieldGrad" cx="50%" cy="35%" r="65%">
+      <stop offset="0%"   stop-color="#1565C0"/>
+      <stop offset="100%" stop-color="#0B3D91"/>
+    </radialGradient>
+    <radialGradient id="innerGrad" cx="50%" cy="30%" r="60%">
+      <stop offset="0%"   stop-color="#1976D2"/>
+      <stop offset="100%" stop-color="#1150b8"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Outer shield with glow -->
+  <path class="shield-glow"
+        d="M100 8 L172 38 L172 108 Q172 158 100 192 Q28 158 28 108 L28 38 Z"
+        fill="url(#shieldGrad)"/>
+  <!-- Inner shield -->
+  <path d="M100 22 L158 48 L158 108 Q158 148 100 178 Q42 148 42 108 L42 48 Z"
+        fill="url(#innerGrad)"/>
+
+  <!-- Road perspective -->
+  <path d="M65 148 L82 80 L118 80 L135 148 Z" fill="rgba(255,255,255,0.07)"/>
+
+  <!-- Animated road dashes -->
+  <rect class="road-dash1" x="97" y="130" width="6" height="12" rx="3" fill="rgba(255,255,255,0.6)"/>
+  <rect class="road-dash2" x="97" y="110" width="6" height="10" rx="3" fill="rgba(255,255,255,0.45)"/>
+  <rect class="road-dash3" x="97" y="93"  width="6" height="8"  rx="3" fill="rgba(255,255,255,0.3)"/>
+
+  <!-- Scan corners - animated -->
+  <path class="corner-tl scan-line" d="M60 96 L60 78 L78 78"
+        fill="none" stroke="#FF671F" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path class="corner-tr scan-line" d="M140 96 L140 78 L122 78"
+        fill="none" stroke="#FF671F" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Outer pulse rings -->
+  <circle class="pulse-ring2" cx="100" cy="112" r="30"
+          fill="none" stroke="#FF671F" stroke-width="1" opacity="0.15"/>
+  <circle class="pulse-ring"  cx="100" cy="112" r="22"
+          fill="none" stroke="#FF671F" stroke-width="1.5" opacity="0.35"/>
+
+  <!-- Detection circle -->
+  <circle cx="100" cy="112" r="14"
+          fill="none" stroke="#FF671F" stroke-width="3.5"/>
+
+  <!-- Animated center dot -->
+  <circle class="dot-center" cx="100" cy="112" r="5" fill="#FF671F"/>
+
+  <!-- Ashoka wheel spinning -->
+  <g class="ashoka">
+    <circle cx="100" cy="162" r="8" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
+    <circle cx="100" cy="162" r="2" fill="rgba(255,255,255,0.5)"/>
+    <line x1="100" y1="154" x2="100" y2="170" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
+    <line x1="92"  y1="162" x2="108" y2="162" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
+    <line x1="94"  y1="156" x2="106" y2="168" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
+    <line x1="106" y1="156" x2="94"  y2="168" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
+  </g>
+</svg>
